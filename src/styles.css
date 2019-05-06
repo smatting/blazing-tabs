@@ -29,7 +29,7 @@ body {
     list-style-type: none;
     /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif */
     /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
-    font-size: 15px;
+    /* font-size: 15px; */
 }
 
 .tab {
@@ -107,11 +107,18 @@ input:focus {
 
 #tab-search {
     width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
+    /* padding: 5px; */
+    /* margin-bottom: 10px; */
+    border: 0px;
     /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
-    font-size: 14px;
-    color: #333333;
+    /* font-size: 14px; */
+    color: #eee;
+    /* background-color: black; */
+    background-color: #454b65;
+    box-sizing: border-box;
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    padding-left: 60px;
 }
 
 #logo {

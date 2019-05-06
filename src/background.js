@@ -47,7 +47,7 @@ function sendTabs(windowId) {
 
 function makeTab() {
   // chrome.tabs.create({url: "index.html", pinned: true});
-  chrome.tabs.create({url: "index.html", pinned: false});
+  chrome.tabs.create({url: "index.html", pinned: true});
 }
 
 function openSearch() {

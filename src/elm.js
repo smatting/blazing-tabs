@@ -4390,7 +4390,7 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
-var author$project$Main$initialModel = {bla: 3, selectedIndex: 0, sortedTabs: _List_Nil, tabs: _List_Nil};
+var author$project$Main$initialModel = {bla: 3, searchQuery: '', selectedIndex: 0, sortedTabs: _List_Nil, tabs: _List_Nil};
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -4881,20 +4881,128 @@ var author$project$Main$closeTab = function (tabId) {
 					elm$json$Json$Encode$int(tabId))
 				])));
 };
+var elm$core$Basics$ge = _Utils_ge;
+var author$project$Main$keepBounds = F2(
+	function (n, i) {
+		return (_Utils_cmp(i, n) > -1) ? 0 : ((i < 0) ? 0 : i);
+	});
 var elm$core$Basics$negate = function (n) {
 	return -n;
 };
+var elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							elm$core$List$foldl,
+							fn,
+							acc,
+							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var elm$core$List$sortBy = _List_sortBy;
+var elm$core$String$contains = _String_contains;
+var elm$core$String$indices = _String_indexes;
+var elm$core$String$toLower = _String_toLower;
 var author$project$Main$computeSorted = function (model) {
-	return _Utils_update(
-		model,
-		{
-			sortedTabs: A2(
+	var sortedTabs = function () {
+		if (model.searchQuery === '') {
+			return A2(
 				elm$core$List$sortBy,
 				function (tab) {
 					return -tab.lastAccessed;
 				},
-				model.tabs)
+				model.tabs);
+		} else {
+			var q = elm$core$String$toLower(model.searchQuery);
+			var tabsFiltered = A2(
+				elm$core$List$filter,
+				function (tab) {
+					return A2(
+						elm$core$String$contains,
+						q,
+						elm$core$String$toLower(tab.title));
+				},
+				model.tabs);
+			return A2(
+				elm$core$List$sortBy,
+				function (tab) {
+					var t = elm$core$String$toLower(tab.title);
+					var idxs = A2(elm$core$String$indices, q, t);
+					if (idxs.b) {
+						var x = idxs.a;
+						var rest = idxs.b;
+						return x;
+					} else {
+						return 100000;
+					}
+				},
+				tabsFiltered);
+		}
+	}();
+	return _Utils_update(
+		model,
+		{
+			selectedIndex: A2(
+				author$project$Main$keepBounds,
+				elm$core$List$length(sortedTabs),
+				model.selectedIndex),
+			sortedTabs: sortedTabs
 		});
 };
 var author$project$Main$highlight = _Platform_outgoingPort('highlight', elm$core$Basics$identity);
@@ -4945,12 +5053,15 @@ var author$project$Main$update = F2(
 					author$project$Main$computeSorted(
 						_Utils_update(
 							model,
-							{tabs: tabs_})),
+							{searchQuery: '', selectedIndex: 0, tabs: tabs_})),
 					elm$core$Platform$Cmd$none);
 			case 'HighlightTab':
 				var tab = msg.a;
 				return _Utils_Tuple2(
-					model,
+					author$project$Main$computeSorted(
+						_Utils_update(
+							model,
+							{searchQuery: ''})),
 					author$project$Main$highlightTab(tab));
 			case 'Refresh':
 				return _Utils_Tuple2(
@@ -4977,7 +5088,7 @@ var author$project$Main$update = F2(
 							{selectedIndex: selectedIndex});
 					}(),
 					elm$core$Platform$Cmd$none);
-			default:
+			case 'SelectionUp':
 				return _Utils_Tuple2(
 					function () {
 						var n = elm$core$List$length(model.tabs);
@@ -4993,8 +5104,19 @@ var author$project$Main$update = F2(
 							{selectedIndex: selectedIndex});
 					}(),
 					elm$core$Platform$Cmd$none);
+			default:
+				var s = msg.a;
+				return _Utils_Tuple2(
+					author$project$Main$computeSorted(
+						_Utils_update(
+							model,
+							{searchQuery: s})),
+					elm$core$Platform$Cmd$none);
 		}
 	});
+var author$project$Main$UpdateSearch = function (a) {
+	return {$: 'UpdateSearch', a: a};
+};
 var author$project$Main$HighlightTab = function (a) {
 	return {$: 'HighlightTab', a: a};
 };
@@ -5096,72 +5218,6 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
-var elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							elm$core$List$foldl,
-							fn,
-							acc,
-							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -5303,14 +5359,18 @@ var elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$input = _VirtualDom_node('input');
 var elm$html$Html$ol = _VirtualDom_node('ol');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
+var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
 var elm$html$Html$Attributes$tabindex = function (n) {
 	return A2(
 		_VirtualDom_attribute,
 		'tabIndex',
 		elm$core$String$fromInt(n));
 };
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
 };
@@ -5322,6 +5382,27 @@ var elm$html$Html$Events$custom = F2(
 			elm$virtual_dom$VirtualDom$Custom(decoder));
 	});
 var elm$html$Html$Events$keyCode = A2(elm$json$Json$Decode$field, 'keyCode', elm$json$Json$Decode$int);
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -5339,6 +5420,17 @@ var author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$id('tab-search'),
+						elm$html$Html$Attributes$type_('text'),
+						elm$html$Html$Events$onInput(author$project$Main$UpdateSearch),
+						elm$html$Html$Attributes$value(model.searchQuery),
+						elm$html$Html$Attributes$placeholder('Type to search...')
+					]),
+				_List_Nil),
 				A2(
 				elm$html$Html$ol,
 				_List_Nil,
@@ -5466,7 +5558,6 @@ var elm$core$String$left = F2(
 	function (n, string) {
 		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
 	});
-var elm$core$String$contains = _String_contains;
 var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {

@@ -28,7 +28,7 @@
       // }
 
       chrome.runtime.onMessage.addListener(function(message, sender) {
-          document.getElementById("tab-view").focus(); 
+          document.getElementById("tab-search").focus(); 
 
           console.log('Got message', message);
           if (message.stabberMsgType == "tabs") {

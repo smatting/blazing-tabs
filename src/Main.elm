@@ -31,6 +31,7 @@ type alias Model =
   , tabs : List Tab
   , selectedIndex : Int
   , sortedTabs : List Tab
+  , searchQuery : String
   }
 
 
@@ -51,6 +52,7 @@ type Msg
     | Refresh
     | SelectionDown
     | SelectionUp
+    | UpdateSearch String
 
 initialModel : Model
 initialModel
@@ -58,6 +60,7 @@ initialModel
       , tabs = []
       , selectedIndex = 0
       , sortedTabs = []
+      , searchQuery = ""
       }
 
 init : String -> (Model, Cmd Msg)
@@ -75,18 +78,49 @@ maybe def f m =
   Maybe.withDefault def (Maybe.map f m)
 
 
+keepBounds : Int -> Int -> Int
+keepBounds n i =
+  if i >= n
+    then 0
+    else
+      if i < 0
+        then 0
+        else
+          i
+
+
 computeSorted : Model -> Model
 computeSorted model =
-  { model
-  | sortedTabs = List.sortBy (\tab -> -tab.lastAccessed) (model.tabs)
-  }
+  let
+      sortedTabs =
+        if (model.searchQuery == "")
+          then List.sortBy (\tab -> -tab.lastAccessed) (model.tabs)
+          else
+            let q = String.toLower model.searchQuery
+                tabsFiltered = List.filter (\tab -> String.toLower tab.title |> String.contains q) (model.tabs)
+            in List.sortBy (\tab ->
+                let
+                    t = String.toLower tab.title
+                    idxs = String.indices q t
+                in
+                    case idxs of
+                      x::rest -> x
+                      _ -> 100000
+                )
+                tabsFiltered
+
+  in
+    { model
+    | sortedTabs = sortedTabs
+    , selectedIndex = keepBounds (List.length sortedTabs) model.selectedIndex
+    }
 
 
 update msg model =
     case msg of
         NoOp -> (model, Cmd.none)
-        Tabs tabs_ -> (computeSorted ({model | tabs = tabs_}), Cmd.none)
-        HighlightTab tab -> (model, highlightTab tab)
+        Tabs tabs_ -> (computeSorted ({model | tabs = tabs_, selectedIndex = 0, searchQuery=""}), Cmd.none)
+        HighlightTab tab -> (computeSorted {model|searchQuery=""}, highlightTab tab)
         Refresh -> (model, queryTabs E.null)
         CloseTab tab -> (model, closeTab tab.id)
         SelectionDown ->
@@ -103,6 +137,8 @@ update msg model =
                selectedIndex = let i = model.selectedIndex in  max (min (i - 1) (n - 1)) 0
             in {model|selectedIndex=selectedIndex}
           , Cmd.none)
+        UpdateSearch s ->
+          (computeSorted {model|searchQuery=s}, Cmd.none)
 
 
 handleKey : Model -> Int -> { message : Msg, stopPropagation : Bool, preventDefault : Bool }
@@ -141,9 +177,17 @@ view model =
     , A.tabindex 0
     , custom "keydown" (D.map (handleKey model) keyCode)
     ]
-    [
+    [ input
+        [ A.id "tab-search"
+        , A.type_ "text"
+        , onInput UpdateSearch
+        , A.value (model.searchQuery)
+        , A.placeholder "Type to search..."
+        ]
+        []
+
       -- button [ onClick Refresh ] [ text "refresh"]
-      ol [] (
+    , ol [] (
         (List.indexedMap Tuple.pair model.sortedTabs) |> List.map (viewTab model)
       )
     ]
