@@ -4856,6 +4856,17 @@ var author$project$Main$tabs = _Platform_incomingPort('tabs', elm$json$Json$Deco
 var author$project$Main$subscriptions = function (model) {
 	return author$project$Main$tabs(author$project$Main$parseTabs);
 };
+var elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var author$project$Main$clipIndex = F2(
+	function (n, i) {
+		return A2(
+			elm$core$Basics$max,
+			A2(elm$core$Basics$min, i, n - 1),
+			0);
+	});
 var author$project$Main$doCloseTab = _Platform_outgoingPort('doCloseTab', elm$core$Basics$identity);
 var elm$json$Json$Encode$int = _Json_wrap;
 var elm$json$Json$Encode$object = function (pairs) {
@@ -4889,6 +4900,7 @@ var author$project$Main$keepBounds = F2(
 var elm$core$Basics$negate = function (n) {
 	return -n;
 };
+var elm$core$Basics$neq = _Utils_notEqual;
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -4967,7 +4979,12 @@ var author$project$Main$computeSorted = function (model) {
 				function (tab) {
 					return -tab.lastAccessed;
 				},
-				model.tabs);
+				A2(
+					elm$core$List$filter,
+					function (tab) {
+						return tab.title !== 'Stabber';
+					},
+					model.tabs));
 		} else {
 			var q = elm$core$String$toLower(model.searchQuery);
 			var tabsFiltered = A2(
@@ -5036,10 +5053,6 @@ var author$project$Main$highlightTab = function (tab) {
 		_List_fromArray(
 			[tab.index]));
 };
-var elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$update = F2(
@@ -5061,7 +5074,7 @@ var author$project$Main$update = F2(
 					author$project$Main$computeSorted(
 						_Utils_update(
 							model,
-							{searchQuery: ''})),
+							{searchQuery: '', selectedIndex: 0})),
 					author$project$Main$highlightTab(tab));
 			case 'Refresh':
 				return _Utils_Tuple2(
@@ -5075,33 +5088,27 @@ var author$project$Main$update = F2(
 			case 'SelectionDown':
 				return _Utils_Tuple2(
 					function () {
-						var n = elm$core$List$length(model.tabs);
-						var selectedIndex = function () {
-							var i = model.selectedIndex;
-							return A2(
-								elm$core$Basics$max,
-								A2(elm$core$Basics$min, i + 1, n - 1),
-								0);
-						}();
+						var n = elm$core$List$length(model.sortedTabs);
+						var i = model.selectedIndex;
+						var iNext = _Utils_eq(i, n - 1) ? 0 : (i + 1);
 						return _Utils_update(
 							model,
-							{selectedIndex: selectedIndex});
+							{
+								selectedIndex: A2(author$project$Main$clipIndex, n, iNext)
+							});
 					}(),
 					elm$core$Platform$Cmd$none);
 			case 'SelectionUp':
 				return _Utils_Tuple2(
 					function () {
-						var n = elm$core$List$length(model.tabs);
-						var selectedIndex = function () {
-							var i = model.selectedIndex;
-							return A2(
-								elm$core$Basics$max,
-								A2(elm$core$Basics$min, i - 1, n - 1),
-								0);
-						}();
+						var n = elm$core$List$length(model.sortedTabs);
+						var i = model.selectedIndex;
+						var iNext = (!i) ? (n - 1) : (i - 1);
 						return _Utils_update(
 							model,
-							{selectedIndex: selectedIndex});
+							{
+								selectedIndex: A2(author$project$Main$clipIndex, n, iNext)
+							});
 					}(),
 					elm$core$Platform$Cmd$none);
 			default:

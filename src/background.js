@@ -40,8 +40,8 @@
 // chrome.tabs.onActivated.addListener(onTabActivated);
 
 function sendTabs(windowId) {
-    chrome.tabs.query({}, function(tabs) {
-        chrome.runtime.sendMessage(null, {stabberMsgType: "tabs", tabs: tabs});
+    chrome.tabs.query({windowId: windowId}, function(tabs) {
+        chrome.runtime.sendMessage(null, {stabberMsgType: "tabs", tabs: tabs, windowId: windowId});
     });
 }
 
@@ -52,14 +52,11 @@ function makeTab() {
 
 function openSearch() {
 
-  chrome.tabs.query({title: 'Stabber'}, function(tabs) {
+  chrome.tabs.query({title: 'Stabber', windowId : browser.windows.WINDOW_ID_CURRENT}, function(tabs) {
       tabs = tabs || [];
       if (tabs.length > 0) {
           const stabberTab = tabs[0];
           console.log('stabberTab', stabberTab);
-
-  //               chrome.runtime.sendMessage(null, {"type": "ACTIVATE_TAB_VIEW"});
-
           sendTabs(stabberTab.windowId);
 
           if (stabberTab.highlighted) {
@@ -102,7 +99,7 @@ console.log('Backend got message', message);
 
   if (message.stabberMsgType == "queryTabs") {
       console.log('message.tabs', message.tabs);
-      sendTabs();
+      sendTabs(message.windowId);
   }
 
 });

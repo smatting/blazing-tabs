@@ -94,7 +94,7 @@ computeSorted model =
   let
       sortedTabs =
         if (model.searchQuery == "")
-          then List.sortBy (\tab -> -tab.lastAccessed) (model.tabs)
+          then List.sortBy (\tab -> -tab.lastAccessed) (List.filter (\tab -> tab.title /= "Stabber") (model.tabs))
           else
             let q = String.toLower model.searchQuery
                 tabsFiltered = List.filter (\tab -> String.toLower tab.title |> String.contains q) (model.tabs)
@@ -115,27 +115,31 @@ computeSorted model =
     , selectedIndex = keepBounds (List.length sortedTabs) model.selectedIndex
     }
 
+clipIndex : Int -> Int -> Int
+clipIndex n i = max (min i (n - 1)) 0
 
 update msg model =
     case msg of
         NoOp -> (model, Cmd.none)
         Tabs tabs_ -> (computeSorted ({model | tabs = tabs_, selectedIndex = 0, searchQuery=""}), Cmd.none)
-        HighlightTab tab -> (computeSorted {model|searchQuery=""}, highlightTab tab)
+        HighlightTab tab -> (computeSorted {model|searchQuery="", selectedIndex=0}, highlightTab tab)
         Refresh -> (model, queryTabs E.null)
         CloseTab tab -> (model, closeTab tab.id)
         SelectionDown ->
           ( 
             let
-                n = List.length model.tabs
-                selectedIndex = let i = model.selectedIndex in  max (min (i + 1) (n - 1)) 0
-            in {model|selectedIndex=selectedIndex}
+                n = List.length model.sortedTabs
+                i = model.selectedIndex
+                iNext = if i == n - 1 then 0 else i + 1
+            in {model|selectedIndex = clipIndex n iNext}
           , Cmd.none)
         SelectionUp ->
           ( 
             let
-               n = List.length model.tabs
-               selectedIndex = let i = model.selectedIndex in  max (min (i - 1) (n - 1)) 0
-            in {model|selectedIndex=selectedIndex}
+               n = List.length model.sortedTabs
+               i = model.selectedIndex
+               iNext = if i == 0 then n - 1 else i - 1
+            in {model|selectedIndex = clipIndex n iNext}
           , Cmd.none)
         UpdateSearch s ->
           (computeSorted {model|searchQuery=s}, Cmd.none)

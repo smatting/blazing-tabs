@@ -14,7 +14,7 @@
 
       app.ports.queryTabs.subscribe(function() {
           console.log('sendMessage: queryTabs');
-          chrome.runtime.sendMessage(null, {stabberMsgType: "queryTabs"});
+          chrome.runtime.sendMessage(null, {stabberMsgType: "queryTabs", windowId: browser.windows.WINDOW_ID_CURRENT});
       });
 
       app.ports.doCloseTab.subscribe(function(msg) {
@@ -31,6 +31,11 @@
           document.getElementById("tab-search").focus(); 
 
           console.log('Got message', message);
+          console.log('WINDOW_ID_CURRENT', browser.windows.WINDOW_ID_CURRENT);
+          console.log('message.windowId', message.windowId);
+
+
+          // if (message.stabberMsgType == "tabs" && message.windowId == browser.windows.WINDOW_ID_CURRENT) {
           if (message.stabberMsgType == "tabs") {
               console.log('message.tabs', message.tabs);
 
