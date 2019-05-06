@@ -1,0 +1,145 @@
+body {
+    /* background: linear-gradient(#326b96,#2c3459); */
+    /* background: linear-gradient(#94c6eb,#7485c2); */
+    /* background: linear-gradient(#f08218,#7485c2); */
+    /* background: linear-gradient(#f08218,#7485c2); */
+
+    /* background: linear-gradient(#326b96,#7d1959); */
+    /* background: linear-gradient(#454b65,#803966); */
+    /* background: linear-gradient(#803966, #454b65); */
+
+    background-color: #454b65;
+
+
+    color: #202020;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#tab-view {
+    width: 900px;
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #f6f6f6;
+}
+
+#tab-view ol {
+    margin: 0px;
+    padding: 0px;
+    list-style-type: none;
+    /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif */
+    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
+    font-size: 15px;
+}
+
+.tab {
+    display: table;
+    table-layout: fixed;
+    cursor: pointer;
+    overflow: hidden;
+    width: 100%;
+    /* line-height: 2.8em; */
+    /* text-overflow: ellipsis; */
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.tab-title {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 0.5em 0px;
+}
+
+.tab:hover {
+     background-color: #d9e1eb;
+}
+
+.tab.selected {
+     background-color: #b6d2f7;
+     /* background-color: #aab5e7; */
+     /* background-color: #f0c9a3; */
+}
+
+.tab-icon-wrap {
+    display: table-cell;
+    width: 30px;
+    text-align: right;
+}
+
+.highlight {
+    color: #cb166f;
+    /* color: #f08218; */
+}
+
+.tab:hover .tab-close-button {
+    visibility: visible;
+}
+
+.tab-icon {
+    display: inline-block;
+    vertical-align: -10%;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    background-size: contain;
+}
+
+
+.tab-close-button:hover {
+    opacity: 1.0;
+    color: #f55600;
+}
+
+.tab-close-button {
+    display: table-cell;
+    width: 30px;
+    text-align: center;
+    margin-right: 10px;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0.5;
+    color: white;
+}
+
+input:focus {
+    outline: none;
+}
+
+#tab-search {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
+    font-size: 14px;
+    color: #333333;
+}
+
+#logo {
+    /* cursor: pointer;
+    position: absolute; */
+    z-index: -1;
+    left: 30px;
+    top: 30px;
+
+    width: 200px;
+    height: 200px;
+
+    background-image: url(hummingbird-flaps.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    
+    background-position-x: 0%;
+    width: 120px;
+    height: 120px;
+    z-index: 2;
+}
+
+#logo:hover {
+    background-position-x: 100%;
+    border: none;
+}
+
+.tab-url {
+    font-size: 70%;
+    opacity: 0.7;
+}

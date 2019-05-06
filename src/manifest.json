@@ -1,0 +1,22 @@
+{
+  "name": "Stabber",
+  "description": "A fast search-based tab switcher",
+  "version": "0.0.1",
+  "background": { "scripts": ["background.js"] },
+  "permissions": ["tabs", "storage"],
+  "browser_action": {
+      "name": "Click to open the tab search"
+  },
+  "manifest_version": 2,
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "windows": "Ctrl+E",
+        "mac": "Ctrl+E",
+        "chromeos": "Ctrl+E",
+        "linux": "Ctrl+E"
+      }
+    }
+  }
+}
