@@ -4800,14 +4800,14 @@ var author$project$Main$NoOp = {$: 'NoOp'};
 var author$project$Main$Tabs = function (a) {
 	return {$: 'Tabs', a: a};
 };
-var author$project$Main$Tab = F6(
-	function (id, windowId, index, title, favIconUrl, lastAccessed) {
-		return {favIconUrl: favIconUrl, id: id, index: index, lastAccessed: lastAccessed, title: title, windowId: windowId};
+var author$project$Main$Tab = F7(
+	function (id, windowId, index, title, favIconUrl, lastAccessed, url) {
+		return {favIconUrl: favIconUrl, id: id, index: index, lastAccessed: lastAccessed, title: title, url: url, windowId: windowId};
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$int = _Json_decodeInt;
 var elm$json$Json$Decode$list = _Json_decodeList;
-var elm$json$Json$Decode$map6 = _Json_map6;
+var elm$json$Json$Decode$map7 = _Json_map7;
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$null = _Json_decodeNull;
 var elm$json$Json$Decode$oneOf = _Json_oneOf;
@@ -4821,8 +4821,8 @@ var elm$json$Json$Decode$nullable = function (decoder) {
 };
 var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$Main$decoder = function () {
-	var tabDecoder = A7(
-		elm$json$Json$Decode$map6,
+	var tabDecoder = A8(
+		elm$json$Json$Decode$map7,
 		author$project$Main$Tab,
 		A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$int),
 		A2(elm$json$Json$Decode$field, 'windowId', elm$json$Json$Decode$int),
@@ -4832,7 +4832,8 @@ var author$project$Main$decoder = function () {
 			elm$json$Json$Decode$field,
 			'favIconUrl',
 			elm$json$Json$Decode$nullable(elm$json$Json$Decode$string)),
-		A2(elm$json$Json$Decode$field, 'lastAccessed', elm$json$Json$Decode$int));
+		A2(elm$json$Json$Decode$field, 'lastAccessed', elm$json$Json$Decode$int),
+		A2(elm$json$Json$Decode$field, 'url', elm$json$Json$Decode$string));
 	return elm$json$Json$Decode$list(tabDecoder);
 }();
 var elm$core$Debug$log = _Debug_log;
@@ -4892,10 +4893,12 @@ var author$project$Main$closeTab = function (tabId) {
 					elm$json$Json$Encode$int(tabId))
 				])));
 };
-var elm$core$Basics$ge = _Utils_ge;
 var author$project$Main$keepBounds = F2(
 	function (n, i) {
-		return (_Utils_cmp(i, n) > -1) ? 0 : ((i < 0) ? 0 : i);
+		return A2(
+			elm$core$Basics$min,
+			A2(elm$core$Basics$max, 0, i),
+			n - 1);
 	});
 var elm$core$Basics$negate = function (n) {
 	return -n;
@@ -4967,11 +4970,36 @@ var elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(
+			A3(elm$core$List$foldl, elm$core$Basics$min, x, xs));
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
 var elm$core$List$sortBy = _List_sortBy;
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var elm$core$String$contains = _String_contains;
 var elm$core$String$indices = _String_indexes;
 var elm$core$String$toLower = _String_toLower;
 var author$project$Main$computeSorted = function (model) {
+	var tabs_ = A2(
+		elm$core$List$filter,
+		function (tab) {
+			return tab.title !== 'Stabber';
+		},
+		model.tabs);
 	var sortedTabs = function () {
 		if (model.searchQuery === '') {
 			return A2(
@@ -4984,30 +5012,29 @@ var author$project$Main$computeSorted = function (model) {
 					function (tab) {
 						return tab.title !== 'Stabber';
 					},
-					model.tabs));
+					tabs_));
 		} else {
 			var q = elm$core$String$toLower(model.searchQuery);
 			var tabsFiltered = A2(
 				elm$core$List$filter,
 				function (tab) {
-					return A2(
-						elm$core$String$contains,
-						q,
-						elm$core$String$toLower(tab.title));
+					var url = elm$core$String$toLower(tab.url);
+					var title = elm$core$String$toLower(tab.title);
+					return A2(elm$core$String$contains, q, title) || A2(elm$core$String$contains, q, url);
 				},
-				model.tabs);
+				tabs_);
 			return A2(
 				elm$core$List$sortBy,
 				function (tab) {
-					var t = elm$core$String$toLower(tab.title);
-					var idxs = A2(elm$core$String$indices, q, t);
-					if (idxs.b) {
-						var x = idxs.a;
-						var rest = idxs.b;
-						return x;
-					} else {
-						return 100000;
-					}
+					var url = elm$core$String$toLower(tab.url);
+					var title = elm$core$String$toLower(tab.title);
+					var idxs = _Utils_ap(
+						A2(elm$core$String$indices, q, title),
+						A2(elm$core$String$indices, q, url));
+					return A2(
+						elm$core$Maybe$withDefault,
+						10000,
+						elm$core$List$minimum(idxs));
 				},
 				tabsFiltered);
 		}
@@ -5188,15 +5215,6 @@ var author$project$Main$handleKey = F2(
 var author$project$Main$CloseTab = function (a) {
 	return {$: 'CloseTab', a: a};
 };
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {

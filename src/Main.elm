@@ -14,7 +14,6 @@ import Task
 import Tuple
 import Process
 import Dict
--- import Random exposing (Generator)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 
@@ -42,6 +41,7 @@ type alias Tab
     , title : String
     , favIconUrl : Maybe String
     , lastAccessed : Int
+    , url : String
     }
 
 type Msg
@@ -80,34 +80,41 @@ maybe def f m =
 
 keepBounds : Int -> Int -> Int
 keepBounds n i =
-  if i >= n
-    then 0
-    else
-      if i < 0
-        then 0
-        else
-          i
+  min (max 0 i) (n - 1)
 
 
 computeSorted : Model -> Model
 computeSorted model =
   let
-      sortedTabs =
-        if (model.searchQuery == "")
-          then List.sortBy (\tab -> -tab.lastAccessed) (List.filter (\tab -> tab.title /= "Stabber") (model.tabs))
-          else
-            let q = String.toLower model.searchQuery
-                tabsFiltered = List.filter (\tab -> String.toLower tab.title |> String.contains q) (model.tabs)
-            in List.sortBy (\tab ->
+    tabs_ = (List.filter (\tab -> tab.title /= "Stabber") (model.tabs))
+    sortedTabs =
+      if (model.searchQuery == "")
+        then
+          List.sortBy
+            (\tab -> -tab.lastAccessed)
+            (List.filter (\tab -> tab.title /= "Stabber") tabs_)
+        else
+          let q = String.toLower model.searchQuery
+              tabsFiltered =
+                List.filter
+                (\tab ->
+                  let
+                    title = String.toLower tab.title
+                    url = String.toLower tab.url
+                  in
+                    String.contains q title || String.contains q url)
+                tabs_
+          in
+              List.sortBy
+              (\tab ->
                 let
-                    t = String.toLower tab.title
-                    idxs = String.indices q t
+                    title = String.toLower tab.title
+                    url = String.toLower tab.url
+                    idxs = String.indices q title ++ String.indices q url
                 in
-                    case idxs of
-                      x::rest -> x
-                      _ -> 100000
-                )
-                tabsFiltered
+                    Maybe.withDefault 10000 (List.minimum idxs)
+              )
+              tabsFiltered
 
   in
     { model
@@ -208,7 +215,7 @@ decoder : D.Decoder (List Tab)
 decoder =
   let
       tabDecoder =
-        D.map6
+        D.map7
           Tab
           (D.field "id" D.int)
           (D.field "windowId" D.int)
@@ -216,6 +223,7 @@ decoder =
           (D.field "title" D.string)
           (D.field "favIconUrl" (D.nullable (D.string)))
           (D.field "lastAccessed" (D.int))
+          (D.field "url" (D.string))
   in
     D.list tabDecoder
 

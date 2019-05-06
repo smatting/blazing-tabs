@@ -5,7 +5,7 @@
   "background": { "scripts": ["background.js"] },
   "permissions": ["tabs", "storage"],
   "browser_action": {
-      "name": "Click to open the tab search"
+      "default_title": "Click to open the tab search"
   },
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
