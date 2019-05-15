@@ -18,7 +18,6 @@
 
         window.onfocus = function () {
             queryTabs();
-            // console.log('got focus!!!');
         };
 
         app.ports.queryTabs.subscribe(function() {
@@ -26,8 +25,9 @@
         });
 
         app.ports.doCloseTab.subscribe(function(msg) {
-            chrome.tabs.remove(msg.tabId, queryTabs);
-        })
+            chrome.tabs.remove(msg.tabId, function() {});
+
+        });
 
         chrome.runtime.onMessage.addListener(function(message, sender) {
             document.getElementById("tab-search").focus(); 

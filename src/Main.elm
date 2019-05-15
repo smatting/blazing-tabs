@@ -131,7 +131,7 @@ update msg model =
         Tabs tabs_ -> (computeSorted ({model | tabs = tabs_, selectedIndex = 0, searchQuery=""}), Cmd.none)
         HighlightTab tab -> (computeSorted {model|searchQuery="", selectedIndex=0}, highlightTab tab)
         Refresh -> (model, queryTabs E.null)
-        CloseTab tab -> (model, closeTab tab.id)
+        CloseTab tab -> (computeSorted {model | tabs = List.filter (\t -> t.id /= tab.id) model.tabs }, closeTab tab.id)
         SelectionDown ->
           ( 
             let

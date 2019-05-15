@@ -5110,7 +5110,17 @@ var author$project$Main$update = F2(
 			case 'CloseTab':
 				var tab = msg.a;
 				return _Utils_Tuple2(
-					model,
+					author$project$Main$computeSorted(
+						_Utils_update(
+							model,
+							{
+								tabs: A2(
+									elm$core$List$filter,
+									function (t) {
+										return !_Utils_eq(t.id, tab.id);
+									},
+									model.tabs)
+							})),
 					author$project$Main$closeTab(tab.id));
 			case 'SelectionDown':
 				return _Utils_Tuple2(
