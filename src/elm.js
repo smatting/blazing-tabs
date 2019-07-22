@@ -5463,7 +5463,7 @@ var author$project$Main$view = function (model) {
 						elm$html$Html$Attributes$type_('text'),
 						elm$html$Html$Events$onInput(author$project$Main$UpdateSearch),
 						elm$html$Html$Attributes$value(model.searchQuery),
-						elm$html$Html$Attributes$placeholder('Type to search...')
+						elm$html$Html$Attributes$placeholder('Type to SErch...')
 					]),
 				_List_Nil),
 				A2(

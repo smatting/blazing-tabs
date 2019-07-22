@@ -193,7 +193,7 @@ view model =
         , A.type_ "text"
         , onInput UpdateSearch
         , A.value (model.searchQuery)
-        , A.placeholder "Type to search..."
+        , A.placeholder "Type to SErch..."
         ]
         []
 
