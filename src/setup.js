@@ -42,10 +42,9 @@
             if (message.stabberMsgType == "tabs") {
                 console.log('message.tabs', message.tabs);
 
-                console.log('size', _.size(message.tabs));
+                console.log('size', message.tabs.length);
 
-
-                const tabs = _.map(message.tabs, function(tab) {
+                const tabs = message.tabs.map((function(tab) {
                     var favIconUrl = null;
                     if (tab.favIconUrl) {
                         favIconUrl = tab.favIconUrl.toString();
@@ -58,9 +57,7 @@
                            , lastAccessed: 0 /* TODO: remove. not available in chrome */
                            , url: tab.url
                            };
-                });
-
-                // console.log('Got tabs', tabs);
+                }));
 
                 app.ports.tabs.send(tabs);
             }
