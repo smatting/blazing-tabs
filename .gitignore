@@ -1,1 +1,5 @@
 elm-stuff
+generated-docs
+output
+.spago
+build
