@@ -55,7 +55,7 @@
                            , index: tab.index
                            , title: tab.title
                            , favIconUrl: favIconUrl
-                           , lastAccessed: tab.lastAccessed
+                           , lastAccessed: 0 /* TODO: remove. not available in chrome */
                            , url: tab.url
                            };
                 });
