@@ -9,7 +9,7 @@ function makeTab() {
 }
 
 function openSearch() {
-  chrome.tabs.query({title: 'Stabber', windowId : browser.windows.WINDOW_ID_CURRENT}, function(tabs) {
+  chrome.tabs.query({title: 'Stabber', windowId : chrome.windows.WINDOW_ID_CURRENT}, function(tabs) {
       tabs = tabs || [];
       if (tabs.length > 0) {
           const stabberTab = tabs[0];

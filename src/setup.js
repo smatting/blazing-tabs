@@ -1,6 +1,6 @@
 (function() {
   window.addEventListener('load', (event) => {
-    browser.windows.getCurrent().then(function(windowInfo) {
+    chrome.windows.getCurrent((function(windowInfo) {
         const myWindowId = windowInfo.id;
 
         var app = Elm.Main.init({
@@ -33,7 +33,7 @@
             document.getElementById("tab-search").focus(); 
 
             // console.log('Got message', message);
-            // console.log('WINDOW_ID_CURRENT', browser.windows.WINDOW_ID_CURRENT);
+            // console.log('WINDOW_ID_CURRENT', chrome.windows.WINDOW_ID_CURRENT);
             // console.log('message.windowId', message.windowId);
             if (message.windowId !== myWindowId) {
                 return;
@@ -65,6 +65,6 @@
                 app.ports.tabs.send(tabs);
             }
         });
-    });
+    }));
   });
 })();
