@@ -5,8 +5,8 @@ let
   easy-ps = import (pkgs.fetchFromGitHub {
     owner = "justinwoo";
     repo = "easy-purescript-nix";
-    rev = "ee8d4545c3eb14ea75b789dbfb84e4e8573941b5";
-    sha256 = "16bcllaf2ra0cbgkc5vlirkh2kkf16237xp4wng6314m3fsxmmag";
+    rev = "13ace3addf14dd9e93af9132e4799b7badfbe99e";
+    sha256 = "1gva113kyygjhn9i92vg6cyj15vhyfhq7haq51cvp4xdz4j0q4xn";
   }) {
     inherit pkgs;
   };
@@ -15,8 +15,7 @@ in pkgs.mkShell {
   buildInputs = [
     easy-ps.purs
     easy-ps.spago
-    easy-ps.spago2nix
 
-    pkgs.nodejs-10_x
+    # pkgs.nodejs-10_x
   ];
 }
