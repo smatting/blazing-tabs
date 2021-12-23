@@ -11,3 +11,7 @@
 4. Click on the extension icon to open the main tab
 5. Save changes to `src/Main.elm`. `elm-live` should automatically compile `src/elm.js`
 6. Refresh the main tab to see the updated view.
+
+# Develop notes
+- https://github.com/purescript-halogen/purescript-halogen/blob/master/docs/guide/04-Lifecycles-Subscriptions.md
+- https://blog.logrocket.com/custom-events-in-javascript-a-complete-guide/#how-to-create-a-custom-event-in-javascript

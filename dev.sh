@@ -1,1 +1,1 @@
-elm-live src/Main.elm --dir=src -- --output=src/elm.js
+spago bundle-app --main Main --to ui/integration/index.js --watch --clear-screen
