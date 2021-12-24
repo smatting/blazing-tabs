@@ -13,5 +13,6 @@
 6. Refresh the main tab to see the updated view.
 
 # Develop notes
+- https://discourse.purescript.org/t/how-to-subscribe-to-custom-ffi-event-from-halogen/1253/9
 - https://github.com/purescript-halogen/purescript-halogen/blob/master/docs/guide/04-Lifecycles-Subscriptions.md
 - https://blog.logrocket.com/custom-events-in-javascript-a-complete-guide/#how-to-create-a-custom-event-in-javascript

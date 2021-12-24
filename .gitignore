@@ -4,3 +4,4 @@ output
 .spago
 build
 src/elm.js
+ui-integration/index.js
