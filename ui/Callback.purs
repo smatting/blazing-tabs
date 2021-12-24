@@ -2,4 +2,6 @@ module Callback where
 import Effect
 import Prelude
 
-foreign import registerCallback :: (String -> Effect Unit) -> Effect Unit
+import Types (Tab)
+
+foreign import registerCallback :: (Array Tab -> Effect Unit) -> Effect Unit

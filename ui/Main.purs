@@ -14,10 +14,11 @@ import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
 import Callback (registerCallback)
 import Effect.Console as Console
+import Types (Tab)
 
 type State = { enabled :: Boolean }
 
-data Action = Toggle | Initialize | Message String
+data Action = Toggle | Initialize | Tabs (Array Tab)
 
 component :: forall q i o m. MonadEffect m => H.Component q i o m
 component =
@@ -45,17 +46,17 @@ handleAction ∷ forall o m. MonadEffect m => Action → H.HalogenM State Action
 handleAction = case _ of
   Initialize -> do
     { emitter, listener } <- H.liftEffect HS.create
-    liftEffect $ registerCallback (\str -> do
+    liftEffect $ registerCallback (\tabs -> do
       Console.log "callback is being called"
-      HS.notify listener (Message str))
+      HS.notify listener (Tabs tabs))
     _ <- H.subscribe emitter
     pure unit
 
   Toggle ->
     H.modify_ \st -> st { enabled = not st.enabled }
 
-  Message msg ->
-    H.liftEffect $ Console.log ("it works! " <> msg)
+  Tabs tabs ->
+    H.liftEffect $ Console.log ("tabs " <> show tabs)
 
 
 main :: Effect Unit
