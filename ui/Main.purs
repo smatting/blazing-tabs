@@ -1,26 +1,27 @@
 module Main where
 
 import Prelude
-
-import Data.Maybe (Maybe(..))
+import Callback (registerCallback)
+import Data.Array as Array
+import Data.Foldable
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.String.Pattern (Pattern(..)) as String
+import Data.String.CodePoints (contains, indexOf) as String
+import Data.String.Common (toLower) as String
+import Effect (Effect)
+import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Console as Console
 import Halogen as H
+import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Web.HTML.HTMLElement as HTMLElement
+import Halogen.Query.Input (RefLabel(..))
 import Halogen.Subscription as HS
-import Effect (Effect)
-import Effect.Class (class MonadEffect, liftEffect)
-import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
-import Callback (registerCallback)
-import Effect.Console as Console
 import Types (Tab)
 import Web.HTML.Common (ClassName(..))
-import Web.UIEvent.InputEvent as InputEvent
-import Data.Array as A
-import Halogen.Query.Input (RefLabel(..))
-import Data.Foldable
+import Web.HTML.HTMLElement as HTMLElement
 
 type State = { enabled :: Boolean,
                tabs :: Array Tab,
@@ -70,7 +71,7 @@ render state =
         ],
       HH.ol
         []
-        (A.mapWithIndex (renderTab state.selectedIndex) state.sortedTabs)
+        (Array.mapWithIndex (renderTab state.selectedIndex) state.sortedTabs)
     ]
 
 renderTab :: forall m. Int -> Int -> Tab -> H.ComponentHTML Action () m
@@ -115,7 +116,8 @@ handleAction = case _ of
 
   Tabs tabs -> do
     -- H.liftEffect $ Console.log ("tabs " <> show tabs)
-    H.modify_ \st -> st { tabs = tabs, sortedTabs = tabs }
+    H.modify_ \st -> st { tabs = tabs, sortedTabs = tabs, searchQuery = "" }
+
     mbEl <- H.getHTMLElementRef (RefLabel "tabSearch")
     for_ mbEl \el ->
       liftEffect $ HTMLElement.focus el
@@ -128,6 +130,10 @@ handleAction = case _ of
     pure unit
 
   UpdateSearch query -> do
+    H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs, searchQuery = query }
+
+
+-- filterAndSort (st.searchQuery)
     -- H.liftEffect $ Console.log query
     pure unit
 
@@ -135,6 +141,28 @@ handleAction = case _ of
     -- H.liftEffect $ Console.log "no-op"
     pure unit
 
+filterAndSort ::  String -> Array Tab -> Array Tab
+filterAndSort searchQuery tabs =
+  let
+    testStrings tab = [String.toLower tab.title, String.toLower tab.url]
+    tabs_ = Array.filter
+              (\tab ->
+                  tab.title /= "Stabber"
+                  && (if searchQuery == ""
+                      then true
+                      else Array.any
+                            (String.contains (String.Pattern searchQuery))
+                            (testStrings tab)))
+              tabs
+  in
+    Array.sortWith
+      (\tab ->
+          let indices =
+                Array.mapMaybe
+                  (String.indexOf (String.Pattern searchQuery))
+                  (testStrings tab)
+          in fromMaybe 10000 (minimum indices))
+      tabs_
 
 main :: Effect Unit
 main = HA.runHalogenAff do
