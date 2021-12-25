@@ -94,9 +94,7 @@ renderTab selectedIndex index tab =
                   ]
                   []
               ],
-      HH.span [ HP.class_ (ClassName "tab-title"),
-                HP.class_ (ClassName "tab-link")
-              ]
+      HH.span [ HP.class_ (ClassName "tab-title") ]
               [ HH.span [] [ HH.text tab.title ] ]
     ]
 
@@ -116,7 +114,7 @@ handleAction = case _ of
 
   Tabs tabs -> do
     -- H.liftEffect $ Console.log ("tabs " <> show tabs)
-    H.modify_ \st -> st { tabs = tabs, sortedTabs = tabs, searchQuery = "" }
+    H.modify_ \st -> st { tabs = tabs, sortedTabs = filterAndSort "" tabs, searchQuery = "" }
 
     mbEl <- H.getHTMLElementRef (RefLabel "tabSearch")
     for_ mbEl \el ->
@@ -145,6 +143,7 @@ filterAndSort ::  String -> Array Tab -> Array Tab
 filterAndSort searchQuery tabs =
   let
     qs = String.split (String.Pattern " ") (String.toLower searchQuery)
+    -- TODO: add domain to teststrings
     -- testStrings tab = [String.toLower tab.title, String.toLower tab.url]
     testStrings tab = [String.toLower tab.title]
     tabs_ = Array.filter
@@ -152,19 +151,11 @@ filterAndSort searchQuery tabs =
                   tab.title /= "Stabber"
                   && (if searchQuery == ""
                       then true
-                      else Array.any
-                            (\s -> Array.all (\q -> (String.contains (String.Pattern q) s)) qs)
-                            (testStrings tab)))
+                      else Array.all
+                            (\q -> Array.any (\s -> (String.contains (String.Pattern q) s)) (testStrings tab))
+                            qs))
               tabs
   in tabs_
-    -- Array.sortWith
-    --   (\tab ->
-    --       let indices =
-    --             Array.mapMaybe
-    --               (String.indexOf (String.Pattern searchQuery))
-    --               (testStrings tab)
-    --       in fromMaybe 10000 (minimum indices))
-    --   tabs_
 
 main :: Effect Unit
 main = HA.runHalogenAff do
