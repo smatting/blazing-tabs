@@ -7,7 +7,7 @@ import Data.Foldable
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String.Pattern (Pattern(..)) as String
 import Data.String.CodePoints (contains, indexOf) as String
-import Data.String.Common (toLower) as String
+import Data.String.Common (toLower, split) as String
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Console as Console
@@ -144,25 +144,27 @@ handleAction = case _ of
 filterAndSort ::  String -> Array Tab -> Array Tab
 filterAndSort searchQuery tabs =
   let
-    testStrings tab = [String.toLower tab.title, String.toLower tab.url]
+    qs = String.split (String.Pattern " ") (String.toLower searchQuery)
+    -- testStrings tab = [String.toLower tab.title, String.toLower tab.url]
+    testStrings tab = [String.toLower tab.title]
     tabs_ = Array.filter
               (\tab ->
                   tab.title /= "Stabber"
                   && (if searchQuery == ""
                       then true
                       else Array.any
-                            (String.contains (String.Pattern searchQuery))
+                            (\s -> Array.all (\q -> (String.contains (String.Pattern q) s)) qs)
                             (testStrings tab)))
               tabs
-  in
-    Array.sortWith
-      (\tab ->
-          let indices =
-                Array.mapMaybe
-                  (String.indexOf (String.Pattern searchQuery))
-                  (testStrings tab)
-          in fromMaybe 10000 (minimum indices))
-      tabs_
+  in tabs_
+    -- Array.sortWith
+    --   (\tab ->
+    --       let indices =
+    --             Array.mapMaybe
+    --               (String.indexOf (String.Pattern searchQuery))
+    --               (testStrings tab)
+    --       in fromMaybe 10000 (minimum indices))
+    --   tabs_
 
 main :: Effect Unit
 main = HA.runHalogenAff do
