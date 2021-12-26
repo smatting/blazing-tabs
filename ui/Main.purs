@@ -175,12 +175,16 @@ instance rangeShow :: Show Range
 findRanges :: String.Pattern -> String -> Array Range
 findRanges pat s =
   let k = String.length (unwrap pat)
-  in unfoldr
-      (\pos ->
-          case String.indexOf' pat pos s of
-            Nothing -> Nothing
-            Just i -> Just (Tuple (Range i (i + k)) (i + k))
-      ) 0
+  in
+   if k == 0
+      then []
+      else
+        unfoldr
+            (\pos ->
+                case String.indexOf' pat pos s of
+                  Nothing -> Nothing
+                  Just i -> Just (Tuple (Range i (i + k)) (i + k))
+            ) 0
 
 mergeRange :: Range -> Range -> Maybe Range
 mergeRange range1@(Range l1 r1) range2@(Range l2 r2)

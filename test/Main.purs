@@ -29,6 +29,8 @@ main = launchAff_ $ runSpec [consoleReporter] do
       findRanges (Pattern "aba") "ababa" `shouldEqual` [Range 0 3]
     it "finds multiple occurences" $
       findRanges (Pattern "aba") "abababa" `shouldEqual` [Range 0 3, Range 4 7]
+    it "returns empty result for an empty pattern" $
+      findRanges (Pattern "") "Stabber" `shouldEqual` []
 
   describe "mergeRange" do
     it "merges ranges that meet" $
