@@ -2,21 +2,26 @@
 Welcome to a Spago project!
 You can edit this file as you like.
 -}
-{ name =
-    "my-project"
+{ name = "my-project"
 , dependencies =
-    [
-    "console",
-    "effect",
-    "halogen",
-    "halogen-subscriptions",
-    "maybe",
-    "prelude",
-    "psci-support"
-    ]
-, packages =
-    ./packages.dhall
-, sources =
-    -- [ "src/**/*.purs", "test/**/*.purs" ]
-    [ "ui/**/*.purs" ]
+  [ "aff"
+  , "arrays"
+  , "console"
+  , "effect"
+  , "foldable-traversable"
+  , "halogen"
+  , "halogen-subscriptions"
+  , "lists"
+  , "maybe"
+  , "newtype"
+  , "prelude"
+  , "psci-support"
+  , "spec"
+  , "strings"
+  , "tuples"
+  , "unfoldable"
+  , "web-html"
+  ]
+, packages = ./packages.dhall
+, sources = [ "ui/**/*.purs", "test/**/*.purs" ]
 }

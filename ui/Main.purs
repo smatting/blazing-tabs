@@ -6,15 +6,20 @@ import Data.Array as Array
 import Data.Foldable
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String.Pattern (Pattern(..)) as String
-import Data.String.CodePoints (contains, indexOf) as String
+import Data.String.CodePoints (contains, indexOf, indexOf', length) as String
 import Data.String.Common (toLower, split) as String
 import Data.String.Regex as Regex
+import Data.Tuple (Tuple(..))
+import Data.List.Types (List(..))
+import Data.List as List
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Console as Console
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
+import Data.Newtype (unwrap)
+import Data.Unfoldable (unfoldr)
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Query.Input (RefLabel(..))
@@ -156,6 +161,49 @@ handleAction = case _ of
 
   NoOp -> do
     pure unit
+
+-- range in a string, indexes are 0-based
+-- second index is exlcusive
+data Range = Range Int Int
+
+derive instance eqRange :: Eq Range
+
+instance rangeShow :: Show Range
+  where
+    show (Range a b) = "Range " <> show a <> " " <> show b
+
+findRanges :: String.Pattern -> String -> Array Range
+findRanges pat s =
+  let k = String.length (unwrap pat)
+  in unfoldr
+      (\pos ->
+          case String.indexOf' pat pos s of
+            Nothing -> Nothing
+            Just i -> Just (Tuple (Range i (i + k)) (i + k))
+      ) 0
+
+mergeRange :: Range -> Range -> Maybe Range
+mergeRange range1@(Range l1 r1) range2@(Range l2 r2)
+  | l1 > l2 = mergeRange range2 range1
+  | l2 <= r1 = Just (Range l1 (max r1 r2))
+  | otherwise = Nothing
+
+joinSortedRanges :: List Range -> List Range
+joinSortedRanges Nil = Nil
+joinSortedRanges (Cons r1 rs) =
+  case rs of
+    Nil -> Cons r1 Nil
+    Cons r2 rest ->
+      case mergeRange r1 r2 of
+        Nothing -> Cons r1 (joinSortedRanges (Cons r2 rest))
+        Just rMerged -> joinSortedRanges (Cons rMerged rest)
+
+joinRanges :: Array Range -> Array Range
+joinRanges =
+  Array.sortWith f >>> List.fromFoldable >>> joinSortedRanges >>> Array.fromFoldable
+  where
+    f :: Range -> Int
+    f (Range l r) = l
 
 filterAndSort ::  String -> Array Tab -> Array Tab
 filterAndSort searchQuery tabs =
