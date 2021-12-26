@@ -8,6 +8,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String.Pattern (Pattern(..)) as String
 import Data.String.CodePoints (contains, indexOf) as String
 import Data.String.Common (toLower, split) as String
+import Data.String.Regex as Regex
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Console as Console
@@ -19,9 +20,11 @@ import Halogen.HTML.Properties as HP
 import Halogen.Query.Input (RefLabel(..))
 import Halogen.Subscription as HS
 import Halogen.VDom.Driver (runUI)
-import Types (Tab)
+import Types (Tab, TabSource)
 import Web.HTML.Common (ClassName(..))
 import Web.HTML.HTMLElement as HTMLElement
+import Data.String.Regex.Unsafe (unsafeRegex)
+import Data.Array.NonEmpty (head) as NonEmpty
 
 type State = { enabled :: Boolean,
                tabs :: Array Tab,
@@ -32,7 +35,7 @@ type State = { enabled :: Boolean,
 
 data Action = Toggle
             | Initialize
-            | Tabs (Array Tab)
+            | Tabs (Array TabSource)
             | HighlightTab Tab
             | CloseTab Tab
             | UpdateSearch String
@@ -66,7 +69,7 @@ render state =
         [ HP.id "tab-search",
           HP.type_ HP.InputText,
           HE.onValueInput UpdateSearch,
-          HP.placeholder "Type to search...",
+          HP.placeholder "type to search...",
           HP.ref (RefLabel "tabSearch")
         ],
       HH.ol
@@ -85,19 +88,38 @@ renderTab selectedIndex index tab =
     [ HP.classes (cls "tab" true <> cls "selected" selected),
       HE.onClick \_ -> HighlightTab tab
     ]
-    [ HH.span [ HP.class_ (ClassName "tab-close-button"), HE.onClick \_ -> CloseTab tab]
-              [ HH.span [] [HH.text "close"]],
+    [
+      -- HH.span [ HP.class_ (ClassName "tab-close-button"), HE.onClick \_ -> CloseTab tab]
+      --         [ HH.span [] [HH.text "close"]],
+
       HH.span [ HP.class_ (ClassName "tab-icon-wrap") ]
-              [ HH.span
+              [
+                HH.span
                   [ HP.class_ (ClassName "tab-icon"),
                     HP.style iconBg
                   ]
                   []
               ],
       HH.span [ HP.class_ (ClassName "tab-title") ]
-              [ HH.span [] [ HH.text tab.title ] ]
+              [
+                HH.span [ HP.class_ (ClassName "hostname") ] [ HH.text (if tab.hostname == "" then "localhost" else tab.hostname) ],
+                HH.span [ HP.class_ (ClassName "title") ] [ HH.text tab.title ]
+                ]
+      -- HH.div [ HP.class_ (ClassName "tab-hostname") ]
     ]
 
+hostnameRegex :: Regex.Regex
+hostnameRegex = unsafeRegex "[^:]+://([^/]+)" mempty
+
+urlHostname :: String -> String
+urlHostname url =
+  case Regex.match hostnameRegex url of
+    Nothing -> ""
+    Just groups ->
+      case indexl 1 ( groups ) of
+        Nothing -> ""
+        Just Nothing -> ""
+        Just (Just s) -> s
 
 handleAction :: forall o m. MonadEffect m => Action → H.HalogenM State Action () o m Unit
 handleAction = case _ of
@@ -112,8 +134,9 @@ handleAction = case _ of
   Toggle ->
     H.modify_ \st -> st { enabled = not st.enabled }
 
-  Tabs tabs -> do
+  Tabs tabsources -> do
     -- H.liftEffect $ Console.log ("tabs " <> show tabs)
+    let (tabs :: Array Tab) = map (\t -> {id: t.id, windowId: t.windowId, index: t.index, title: t.title, favIconUrl: t.favIconUrl, url: t.url, hostname: urlHostname t.url}) tabsources
     H.modify_ \st -> st { tabs = tabs, sortedTabs = filterAndSort "" tabs, searchQuery = "" }
 
     mbEl <- H.getHTMLElementRef (RefLabel "tabSearch")
@@ -129,14 +152,9 @@ handleAction = case _ of
 
   UpdateSearch query -> do
     H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs, searchQuery = query }
-
-
--- filterAndSort (st.searchQuery)
-    -- H.liftEffect $ Console.log query
     pure unit
 
   NoOp -> do
-    -- H.liftEffect $ Console.log "no-op"
     pure unit
 
 filterAndSort ::  String -> Array Tab -> Array Tab
@@ -144,8 +162,8 @@ filterAndSort searchQuery tabs =
   let
     qs = String.split (String.Pattern " ") (String.toLower searchQuery)
     -- TODO: add domain to teststrings
-    -- testStrings tab = [String.toLower tab.title, String.toLower tab.url]
-    testStrings tab = [String.toLower tab.title]
+    testStrings tab = [String.toLower tab.title] <> (if tab.hostname == "" then [] else [String.toLower tab.hostname])
+    -- testStrings tab = [String.toLower tab.title]
     tabs_ = Array.filter
               (\tab ->
                   tab.title /= "Stabber"
