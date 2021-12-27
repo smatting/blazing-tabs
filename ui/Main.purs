@@ -103,7 +103,7 @@ handleKeyDown keyboardEvent = do
      handle
      getSelectedTab >>= \mbTab -> case mbTab of
        Nothing -> pure unit
-       Just tab -> liftEffect $ switchToTab tab.id
+       Just tab -> liftEffect $ switchToTab tab.index
    "ArrowLeft" -> do
      when (KeyboardEvent.ctrlKey keyboardEvent) $ do
        handle
@@ -202,6 +202,7 @@ handleAction = case _ of
           map (\t ->
                 { id: t.id,
                   windowId: t.windowId,
+                  index: t.index,
                   title: t.title,
                   titleDisplay: [Tuple NoHighlight t.title],
                   favIconUrl: favIconUrl Just Nothing t,

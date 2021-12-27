@@ -1,1 +1,1 @@
-elm make src/Main.elm --output=build/elm.js
+spago bundle-app --main Main --to src/index.js

@@ -7,6 +7,7 @@ You can edit this file as you like.
   [ "aff"
   , "arrays"
   , "console"
+  , "dom-indexed"
   , "effect"
   , "foldable-traversable"
   , "halogen"
@@ -20,7 +21,9 @@ You can edit this file as you like.
   , "strings"
   , "tuples"
   , "unfoldable"
+  , "web-events"
   , "web-html"
+  , "web-uievents"
   ]
 , packages = ./packages.dhall
 , sources = [ "ui/**/*.purs", "test/**/*.purs" ]

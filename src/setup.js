@@ -3,14 +3,17 @@
     chrome.windows.getCurrent((function(windowInfo) {
         const myWindowId = windowInfo.id;
 
-        var app = Elm.Main.init({
-          node: document.getElementById('elm'),
-          flags: "bla"
-        });
+        // var app = Elm.Main.init({
+        //   node: document.getElementById('elm'),
+        //   flags: "bla"
+        // });
 
-        app.ports.highlight.subscribe(function(highlightInfo) {
-          chrome.tabs.highlight(highlightInfo);
+        callbacks.register('switchToTab', function(tabId) {
+            chrome.tabs.highlight({"windowId": myWindowId, "tabs": [tabId]});
         });
+        // app.ports.highlight.subscribe(function(highlightInfo) {
+        //   chrome.tabs.highlight(highlightInfo);
+        // });
 
         const queryTabs = function() {
           chrome.runtime.sendMessage(null, {stabberMsgType: "queryTabs", windowId: myWindowId});
@@ -20,14 +23,16 @@
             queryTabs();
         };
 
-        app.ports.queryTabs.subscribe(function() {
-            queryTabs();
-        });
+        // TODO
+        // app.ports.queryTabs.subscribe(function() {
+        //     queryTabs();
+        // });
 
-        app.ports.doCloseTab.subscribe(function(msg) {
-            chrome.tabs.remove(msg.tabId, function() {});
+        // TODO
+        // app.ports.doCloseTab.subscribe(function(msg) {
+        //     chrome.tabs.remove(msg.tabId, function() {});
 
-        });
+        // });
 
         chrome.runtime.onMessage.addListener(function(message, sender) {
             document.getElementById("tab-search").focus(); 
@@ -59,9 +64,12 @@
                            };
                 }));
 
-                app.ports.tabs.send(tabs);
+                callbacks.call('notifyTabs', tabs);
+                // app.ports.tabs.send(tabs);
             }
         });
+
+        queryTabs();
     }));
   });
 })();
