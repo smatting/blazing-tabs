@@ -167,5 +167,5 @@ input:focus {
 }
 
 .hi {
-    color: red;
+    background-color: rgba(245, 189, 23, 0.68);
 }
