@@ -81,6 +81,7 @@ render state =
     [ HH.input
         [ HP.id "tab-search",
           HP.type_ HP.InputText,
+          HP.value state.searchQuery,
           HE.onValueInput UpdateSearch,
           HP.placeholder "type to search...",
           HP.ref (RefLabel "tabSearch")
@@ -197,7 +198,6 @@ handleAction = case _ of
     H.modify_ \st -> st { enabled = not st.enabled }
 
   Tabs tabsources -> do
-    -- H.liftEffect $ Console.log ("tabs " <> show tabs)
     let (tabs :: Array Tab) =
           map (\t ->
                 { id: t.id,
