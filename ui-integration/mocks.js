@@ -31,8 +31,7 @@
         "successorTabId": -1,
         "cookieStoreId": "firefox-default",
         "url": "moz-extension://45ba499b-65f9-4806-907c-62795d6ef1f6/index.html",
-        "title": "Stabber",
-        "favIconUrl": ""
+        "title": "Stabber"
     },
     {
         "id": 88,
@@ -124,8 +123,7 @@
         "successorTabId": -1,
         "cookieStoreId": "firefox-default",
         "url": "file:///home/stefan/repos/stabber/generated-docs/html/Foreign.html#search:show",
-        "title": "PureScript: Foreign",
-        "favIconUrl": ""
+        "title": "PureScript: Foreign"
     },
     {
         "id": 61,

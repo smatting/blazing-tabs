@@ -31,7 +31,7 @@ import Halogen.Query.Input (RefLabel(..))
 import Halogen.Subscription as HS
 import Halogen.VDom.Driver (runUI)
 import Prelude
-import Types (Tab, TabSource, Highlight(..))
+import Types (Tab, TabSource, Highlight(..), favIconUrl)
 import Web.Event.Event (preventDefault, stopPropagation)
 import Web.HTML.Common (ClassName(..))
 import Web.HTML.HTMLElement as HTMLElement
@@ -134,7 +134,7 @@ moveSelection delta state =
 renderTab :: forall m. Int -> Int -> Tab -> H.ComponentHTML Action () m
 renderTab selectedIndex index tab =
   let
-    iconBg = "background-image: url('" <> tab.favIconUrl <> "')"
+    iconBg url = "background-image: url('" <> url <> "')"
     selected = selectedIndex == index
     cls name enable = if enable then[ ClassName name ] else []
   in
@@ -149,9 +149,10 @@ renderTab selectedIndex index tab =
       HH.span [ HP.class_ (ClassName "tab-icon-wrap") ]
               [
                 HH.span
-                  [ HP.class_ (ClassName "tab-icon"),
-                    HP.style iconBg
-                  ]
+                  ([ HP.class_ (ClassName "tab-icon") ] <>
+                   case tab.favIconUrl of
+                     Nothing -> []
+                     Just favIconUrl -> [HP.style (iconBg favIconUrl)])
                   []
               ],
       HH.span [ HP.class_ (ClassName "tab-title") ]
@@ -201,10 +202,9 @@ handleAction = case _ of
           map (\t ->
                 { id: t.id,
                   windowId: t.windowId,
-                  index: t.index,
                   title: t.title,
                   titleDisplay: [Tuple NoHighlight t.title],
-                  favIconUrl: t.favIconUrl,
+                  favIconUrl: favIconUrl Just Nothing t,
                   url: t.url,
                   hostname: urlHostname t.url,
                   hostnameDisplay: [Tuple NoHighlight (urlHostname t.url)] })
