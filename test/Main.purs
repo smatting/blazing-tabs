@@ -2,11 +2,10 @@ module Test.Main where
 
 import Prelude
 import Data.Maybe
-import Effect (Effect)
 import Effect.Class.Console (log)
 import Effect (Effect)
 import Effect.Aff (launchAff_, delay)
-import Test.Spec (pending, describe, it)
+import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
 import Test.Spec.Runner (runSpec)
