@@ -202,7 +202,6 @@ handleAction = case _ of
           map (\t ->
                 { id: t.id,
                   windowId: t.windowId,
-                  index: t.index,
                   title: t.title,
                   titleDisplay: [Tuple NoHighlight t.title],
                   favIconUrl: favIconUrl Just Nothing t,

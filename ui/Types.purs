@@ -5,7 +5,6 @@ import Data.Maybe
 
 type TabSource = {
   id :: Int,
-  index :: Int,
   windowId :: Int,
   title :: String,
   url :: String
@@ -17,7 +16,6 @@ data Highlight = Highlight | NoHighlight
 
 type Tab = {
   id :: Int,
-  index :: Int,
   windowId :: Int,
   title :: String,
   titleDisplay :: Array (Tuple Highlight String),
