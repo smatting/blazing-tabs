@@ -222,12 +222,21 @@
     }
     ];
 
+    callbacks.register('switchToTab', function(arg) {
+        console.log('[mock] switching to tab ', arg);
+    });
+
+    callbacks.register('closeTab', function(arg) {
+        console.log('[mock] closing tab ', arg);
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log('doc ready');
         setTimeout(function() {
-            console.log('sending message');
+            // console.log('sending message');
             callbacks.call('notifyTabs', fakeTabs);
         }, 100);
     }, false);
+
 
 })();

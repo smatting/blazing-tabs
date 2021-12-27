@@ -1,39 +1,42 @@
 module Main where
 
-import Prelude
-import Callback (registerCallback)
+import Callback (registerCallback, switchToTab, closeTab)
+import DOM.HTML.Indexed
 import Data.Array as Array
+import Data.Array.NonEmpty (head) as NonEmpty
 import Data.Array.NonEmpty as NonEmpty
 import Data.Foldable
+import Data.List ((:))
+import Data.List as List
+import Data.List.Types (List(..))
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String.Pattern (Pattern(..)) as String
+import Data.Newtype (unwrap)
+import Data.Semigroup.Foldable (foldMap1)
 import Data.String.CodePoints (contains, indexOf, indexOf', length, splitAt, take) as String
 import Data.String.Common (toLower, split) as String
+import Data.String.Pattern (Pattern(..)) as String
 import Data.String.Regex as Regex
+import Data.String.Regex.Unsafe (unsafeRegex)
 import Data.Tuple (Tuple(..))
-import Data.List.Types (List(..))
-import Data.List as List
-import Data.List ((:))
+import Data.Unfoldable (unfoldr)
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Console as Console
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
-import Data.Newtype (unwrap)
-import Data.Unfoldable (unfoldr)
-import Data.Semigroup.Foldable (foldMap1)
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.Query.Input (RefLabel(..))
 import Halogen.Subscription as HS
 import Halogen.VDom.Driver (runUI)
+import Prelude
 import Types (Tab, TabSource, Highlight(..))
+import Web.Event.Event (preventDefault, stopPropagation)
 import Web.HTML.Common (ClassName(..))
 import Web.HTML.HTMLElement as HTMLElement
-import DOM.HTML.Indexed
-import Data.String.Regex.Unsafe (unsafeRegex)
-import Data.Array.NonEmpty (head) as NonEmpty
+import Web.UIEvent.KeyboardEvent (KeyboardEvent(..))
+import Web.UIEvent.KeyboardEvent as KeyboardEvent
 
 type State = { enabled :: Boolean,
                tabs :: Array Tab,
@@ -48,6 +51,7 @@ data Action = Toggle
             | HighlightTab Tab
             | CloseTab Tab
             | UpdateSearch String
+            | KeyDown KeyboardEvent
             | NoOp
 
 component :: forall q i o m. MonadEffect m => H.Component q i o m
@@ -71,8 +75,8 @@ render :: forall m. State -> H.ComponentHTML Action () m
 render state =
   HH.div
     [ HP.id "tab-view",
-      HP.tabIndex 0
-      -- TODO: keydown
+      HP.tabIndex 0,
+      HE.onKeyDown KeyDown
     ]
     [ HH.input
         [ HP.id "tab-search",
@@ -85,6 +89,44 @@ render state =
         []
         (Array.mapWithIndex (renderTab state.selectedIndex) state.sortedTabs)
     ]
+
+handleKeyDown :: forall o m. MonadEffect m => KeyboardEvent -> H.HalogenM State Action () o m Unit
+handleKeyDown keyboardEvent = do
+  case KeyboardEvent.code keyboardEvent of
+   "ArrowUp" -> do
+     handle
+     H.modify_ (moveSelection (-1))
+   "ArrowDown" -> do
+     handle
+     H.modify_ (moveSelection 1)
+   "Enter" -> do
+     handle
+     getSelectedTab >>= \mbTab -> case mbTab of
+       Nothing -> pure unit
+       Just tab -> liftEffect $ switchToTab tab.id
+   "ArrowLeft" -> do
+     when (KeyboardEvent.ctrlKey keyboardEvent) $ do
+       handle
+       getSelectedTab >>= \mbTab -> case mbTab of
+         Nothing -> pure unit
+         Just tab -> do
+           liftEffect $ closeTab tab.id
+           H.modify_ \state -> state
+   _ -> do
+     pure unit
+  where
+    handle = liftEffect $ do
+      preventDefault (KeyboardEvent.toEvent keyboardEvent)
+      stopPropagation (KeyboardEvent.toEvent keyboardEvent)
+
+    getSelectedTab = do
+      state <- H.get
+      pure $ Array.index state.sortedTabs state.selectedIndex
+
+moveSelection :: Int -> State -> State
+moveSelection delta state =
+  let selectedIndex = (state.selectedIndex + delta) `mod` Array.length state.sortedTabs
+  in state { selectedIndex = selectedIndex }
 
 renderTab :: forall m. Int -> Int -> Tab -> H.ComponentHTML Action () m
 renderTab selectedIndex index tab =
@@ -142,7 +184,7 @@ handleAction = case _ of
   Initialize -> do
     { emitter, listener } <- H.liftEffect HS.create
     liftEffect $ registerCallback (\tabs -> do
-      Console.log "callback is being called"
+      -- Console.log "callback is being called"
       HS.notify listener (Tabs tabs))
     _ <- H.subscribe emitter
     pure unit
@@ -178,8 +220,9 @@ handleAction = case _ of
     pure unit
 
   UpdateSearch query -> do
-    H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs, searchQuery = query }
-    pure unit
+    H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs, searchQuery = query, selectedIndex = 0 }
+
+  KeyDown keyboardEvent -> handleKeyDown keyboardEvent
 
   NoOp -> do
     pure unit
