@@ -3,5 +3,5 @@ generated-docs
 output
 .spago
 build
-src/elm.js
+src/index.js
 ui-integration/index.js
