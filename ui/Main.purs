@@ -109,9 +109,12 @@ handleKeyDown keyboardEvent = do
        handle
        getSelectedTab >>= \mbTab -> case mbTab of
          Nothing -> pure unit
-         Just tab -> do
-           liftEffect $ closeTab tab.id
-           H.modify_ \state -> state
+         Just selectedTab -> do
+           liftEffect $ closeTab selectedTab.id
+           H.modify_ \state ->
+             let tabs' = Array.filter (\tab -> tab.id /= selectedTab.id) state.tabs
+                 sortedTabs' = filterAndSort state.searchQuery tabs'
+             in state { tabs = tabs', sortedTabs = sortedTabs', selectedIndex = state.selectedIndex `mod` Array.length sortedTabs'}
    _ -> do
      pure unit
   where
