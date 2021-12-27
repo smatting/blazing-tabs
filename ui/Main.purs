@@ -103,7 +103,7 @@ handleKeyDown keyboardEvent = do
      handle
      getSelectedTab >>= \mbTab -> case mbTab of
        Nothing -> pure unit
-       Just tab -> liftEffect $ switchToTab tab.index
+       Just tab -> liftEffect $ switchToTab tab.id
    "ArrowLeft" -> do
      when (KeyboardEvent.ctrlKey keyboardEvent) $ do
        handle

@@ -3,17 +3,11 @@
     chrome.windows.getCurrent((function(windowInfo) {
         const myWindowId = windowInfo.id;
 
-        // var app = Elm.Main.init({
-        //   node: document.getElementById('elm'),
-        //   flags: "bla"
-        // });
-
         callbacks.register('switchToTab', function(tabId) {
-            chrome.tabs.highlight({"windowId": myWindowId, "tabs": [tabId]});
+           chrome.tabs.get(tabId, function(tab) {
+             chrome.tabs.highlight({"windowId": myWindowId, "tabs": [tab.index]});
+           });
         });
-        // app.ports.highlight.subscribe(function(highlightInfo) {
-        //   chrome.tabs.highlight(highlightInfo);
-        // });
 
         const queryTabs = function() {
           chrome.runtime.sendMessage(null, {stabberMsgType: "queryTabs", windowId: myWindowId});
@@ -28,11 +22,9 @@
         //     queryTabs();
         // });
 
-        // TODO
-        // app.ports.doCloseTab.subscribe(function(msg) {
-        //     chrome.tabs.remove(msg.tabId, function() {});
-
-        // });
+        callbacks.register('closeTab', function(tabId) {
+            chrome.tabs.remove(tabId, function() {});
+        });
 
         chrome.runtime.onMessage.addListener(function(message, sender) {
             document.getElementById("tab-search").focus(); 
