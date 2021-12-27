@@ -165,3 +165,7 @@ input:focus {
     background-position-x: 100%;
     border: none;
 }
+
+.hi {
+    color: red;
+}

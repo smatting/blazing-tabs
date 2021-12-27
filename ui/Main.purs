@@ -31,6 +31,7 @@ import Halogen.VDom.Driver (runUI)
 import Types (Tab, TabSource, Highlight(..))
 import Web.HTML.Common (ClassName(..))
 import Web.HTML.HTMLElement as HTMLElement
+import DOM.HTML.Indexed
 import Data.String.Regex.Unsafe (unsafeRegex)
 import Data.Array.NonEmpty (head) as NonEmpty
 
@@ -109,12 +110,19 @@ renderTab selectedIndex index tab =
                   []
               ],
       HH.span [ HP.class_ (ClassName "tab-title") ]
-              [
-                HH.span [ HP.class_ (ClassName "hostname") ] [ HH.text (if tab.hostname == "" then "localhost" else tab.hostname) ],
-                HH.span [ HP.class_ (ClassName "title") ] [ HH.text tab.title ]
-                ]
+              (
+                (if tab.hostname == "" then [] else [HH.span [ HP.class_ (ClassName "hostname") ] (renderHighlights tab.hostnameDisplay)])
+                <> [HH.span [ HP.class_ (ClassName "title") ] (renderHighlights tab.titleDisplay)]
+              )
       -- HH.div [ HP.class_ (ClassName "tab-hostname") ]
     ]
+
+renderHighlights arr =
+  map (\(Tuple hi str) -> HH.span (cls hi) [HH.text str]) arr
+  where
+    cls Highlight = [ HP.class_ (ClassName "hi") ]
+    cls NoHighlight = []
+
 
 hostnameRegex :: Regex.Regex
 hostnameRegex = unsafeRegex "[^:]+://([^/]+)" mempty
@@ -210,11 +218,11 @@ joinSortedRanges :: List Range -> List Range
 joinSortedRanges Nil = Nil
 joinSortedRanges (Cons r1 rs) =
   case rs of
-    Nil -> Cons r1 Nil
-    Cons r2 rest ->
+    Nil -> r1 : Nil
+    r2 : rest ->
       case mergeRange r1 r2 of
-        Nothing -> Cons r1 (joinSortedRanges (Cons r2 rest))
-        Just rMerged -> joinSortedRanges (Cons rMerged rest)
+        Nothing -> r1 : joinSortedRanges (r2 : rest)
+        Just rMerged -> joinSortedRanges (rMerged : rest)
 
 joinRanges :: Array Range -> Array Range
 joinRanges =
@@ -254,8 +262,8 @@ displayHightlights' str ranges =
   let n = String.length str
       f start ranges =
           case ranges of
-            Nil -> Cons (Tuple NoHighlight (takeRange (Range start n) str)) Nil
-            Cons (Range l r) rest ->
+            Nil -> (Tuple NoHighlight (takeRange (Range start n) str)) : Nil
+            Range l r : rest ->
               (Tuple NoHighlight (takeRange (Range start l) str)) :
                 (Tuple Highlight (takeRange (Range l r) str)) :
                   f r rest
@@ -268,22 +276,22 @@ displayHightlights str ranges =
 filterAndSort ::  String -> Array Tab -> Array Tab
 filterAndSort searchQuery tabs =
   let xs = Array.filter (\x -> x /= "") $ String.split (String.Pattern " ") (String.toLower searchQuery)
+      tabs' = Array.filter (\tab -> tab.title /= "Stabber") tabs
   in
-    case (NonEmpty.fromArray xs) of
-      Nothing -> tabs
+    case NonEmpty.fromArray xs of
+      Nothing -> tabs'
       Just qs -> Array.mapMaybe
                     (\tab ->
-                        let isStabber = tab.title == "Stabber"
-                            titleLo = String.toLower tab.title
+                        let titleLo = String.toLower tab.title
                             hostnameLo = String.toLower tab.hostname
                         in
                           case foldMap1 (mkMatch titleLo hostnameLo <<< String.Pattern) qs of
                             NoMatch -> Nothing
                             Matches m ->
-                              let tab' = tab {titleDisplay = displayHightlights tab.title m.titleMatches,
-                                              hostnameDisplay = displayHightlights tab.hostname m.hostnameMatches}
+                              let tab' = tab {titleDisplay = displayHightlights tab.title (joinRanges m.titleMatches),
+                                              hostnameDisplay = displayHightlights tab.hostname (joinRanges m.hostnameMatches)}
                               in Just tab')
-                    tabs
+                    tabs'
 
 main :: Effect Unit
 main = HA.runHalogenAff do
