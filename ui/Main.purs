@@ -83,7 +83,7 @@ render state =
           HP.type_ HP.InputText,
           HP.value state.searchQuery,
           HE.onValueInput UpdateSearch,
-          HP.placeholder "type to search...",
+          HP.placeholder "Search...",
           HP.ref (RefLabel "tabSearch")
         ],
       HH.ol
