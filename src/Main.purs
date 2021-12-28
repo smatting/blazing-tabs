@@ -1,6 +1,6 @@
 module Main where
 
-import Callback (registerCallback, switchToTab, closeTab)
+import ExtInterface (registerCallback, switchToTab, closeTab)
 import DOM.HTML.Indexed
 import Data.Array as Array
 import Data.Array.NonEmpty (head) as NonEmpty
@@ -91,7 +91,7 @@ render state =
           (Array.mapWithIndex (renderTab state.selectedIndex) state.sortedTabs),
         HH.div [ HP.class_ (ClassName "quick-help") ] [
           HH.text "Use the arrow keys and ENTER to switch a tab. Ctrl+Left to close the selected tab. ",
-          HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text " Set up a hotkey" ]
+          HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text " Set up a hotkey." ]
         ]
       ],
     HH.div

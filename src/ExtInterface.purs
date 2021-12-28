@@ -1,4 +1,4 @@
-module Callback where
+module ExtInterface where
 import Effect
 import Prelude
 
