@@ -17,7 +17,7 @@ main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
   describe "findRanges" do
     it "finds pattern that is a strict substring" $
-      findRanges (Pattern "tab") "Stabber" `shouldEqual` [Range 1 4]
+      findRanges (Pattern "tab") "blazing-tabs" `shouldEqual` [Range 8 11]
     it "finds pattern that equal the string" $
       findRanges (Pattern "tab") "tab" `shouldEqual` [Range 0 3]
     it "finds pattern that equal the string with prefix" $
@@ -29,7 +29,7 @@ main = launchAff_ $ runSpec [consoleReporter] do
     it "finds multiple occurences" $
       findRanges (Pattern "aba") "abababa" `shouldEqual` [Range 0 3, Range 4 7]
     it "returns empty result for an empty pattern" $
-      findRanges (Pattern "") "Stabber" `shouldEqual` []
+      findRanges (Pattern "") "blazing-tabs" `shouldEqual` []
 
   describe "mergeRange" do
     it "merges ranges that meet" $

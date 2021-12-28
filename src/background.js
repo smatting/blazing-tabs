@@ -1,6 +1,6 @@
 function sendTabs(windowId) {
     chrome.tabs.query({windowId: windowId}, function(tabs) {
-        chrome.runtime.sendMessage(null, {stabberMsgType: "tabs", tabs: tabs, windowId: windowId});
+        chrome.runtime.sendMessage(null, {btabsMsgType: "tabs", tabs: tabs, windowId: windowId});
     });
 }
 
@@ -9,15 +9,15 @@ function makeTab() {
 }
 
 function openSearch() {
-  chrome.tabs.query({title: 'Stabber', windowId : chrome.windows.WINDOW_ID_CURRENT}, function(tabs) {
+  chrome.tabs.query({title: 'Blazing Tabs', windowId : chrome.windows.WINDOW_ID_CURRENT}, function(tabs) {
       tabs = tabs || [];
       if (tabs.length > 0) {
-          const stabberTab = tabs[0];
-          console.log('stabberTab', stabberTab);
-          // sendTabs(stabberTab.windowId);
+          const blazingTab = tabs[0];
+          console.log('blazingTab', blazingTab);
+          // sendTabs(blazingTab.windowId);
 
-          if (!stabberTab.highlighted) {
-            chrome.tabs.highlight({windowId: stabberTab.windowId, tabs: [stabberTab.index]});
+          if (!blazingTab.highlighted) {
+            chrome.tabs.highlight({windowId: blazingTab.windowId, tabs: [blazingTab.index]});
           } 
 
       } else {
@@ -29,7 +29,7 @@ function openSearch() {
 chrome.browserAction.onClicked.addListener(openSearch);
 
 chrome.runtime.onMessage.addListener(function(message, sender) {
-  if (message.stabberMsgType == "queryTabs") {
+  if (message.btabsMsgType == "queryTabs") {
       console.log('message.tabs', message.tabs);
       sendTabs(message.windowId);
   }

@@ -1,3 +1,5 @@
+# Blazing Tabs
+
 # How to build
 
 1. Start a nix-shell `nix-shell`

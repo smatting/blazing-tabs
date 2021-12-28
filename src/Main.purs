@@ -322,7 +322,7 @@ displayHightlights str ranges =
 filterAndSort ::  String -> Array Tab -> Array Tab
 filterAndSort searchQuery tabs =
   let xs = Array.filter (\x -> x /= "") $ String.split (String.Pattern " ") (String.toLower searchQuery)
-      tabs' = Array.filter (\tab -> tab.title /= "Stabber") tabs
+      tabs' = Array.filter (\tab -> tab.title /= "Blazing Tabs") tabs
   in
     case NonEmpty.fromArray xs of
       Nothing -> tabs'

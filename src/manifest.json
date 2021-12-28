@@ -1,5 +1,5 @@
 {
-  "name": "Stabber",
+  "name": "Blazing Tabs",
   "description": "A fast search-based tab switcher",
   "version": "0.0.1",
   "background": { "scripts": ["background.js"] },

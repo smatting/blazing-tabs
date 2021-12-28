@@ -10,7 +10,7 @@
         });
 
         const queryTabs = function() {
-          chrome.runtime.sendMessage(null, {stabberMsgType: "queryTabs", windowId: myWindowId});
+          chrome.runtime.sendMessage(null, {btabsMsgType: "queryTabs", windowId: myWindowId});
         }
 
         window.onfocus = function () {
@@ -36,7 +36,7 @@
                 return;
             }
             
-            if (message.stabberMsgType == "tabs") {
+            if (message.btabsMsgType == "tabs") {
                 console.log('message.tabs', message.tabs);
 
                 console.log('size', message.tabs.length);
