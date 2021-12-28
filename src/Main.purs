@@ -132,7 +132,10 @@ handleKeyDown keyboardEvent = do
            H.modify_ \state ->
              let tabs' = Array.filter (\tab -> tab.id /= selectedTab.id) state.tabs
                  sortedTabs' = filterAndSort state.searchQuery tabs'
-             in state { tabs = tabs', sortedTabs = sortedTabs', selectedIndex = state.selectedIndex `mod` Array.length sortedTabs'}
+             in state { tabs = tabs',
+                        sortedTabs = sortedTabs',
+                        selectedIndex = state.selectedIndex `mod` Array.length sortedTabs'
+                      }
    _ -> do
      pure unit
   where
@@ -172,8 +175,14 @@ renderTab selectedIndex index tab =
               ],
       HH.span [ HP.class_ (ClassName "tab-title") ]
               (
-                (if tab.hostname == "" then [] else [HH.span [ HP.class_ (ClassName "hostname") ] (renderHighlights tab.hostnameDisplay)])
-                <> [HH.span [ HP.class_ (ClassName "title") ] (renderHighlights tab.titleDisplay)]
+                (if tab.hostname == ""
+                 then []
+                 else [HH.span
+                        [ HP.class_ (ClassName "hostname") ]
+                        (renderHighlights tab.hostnameDisplay)])
+                <> [HH.span
+                      [ HP.class_ (ClassName "title") ]
+                      (renderHighlights tab.titleDisplay)]
               )
     ]
 
@@ -229,7 +238,8 @@ handleAction = case _ of
     pure unit
 
   UpdateSearch query -> do
-    H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs, searchQuery = query, selectedIndex = 0 }
+    H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs,
+                          searchQuery = query, selectedIndex = 0 }
 
   KeyDown keyboardEvent -> handleKeyDown keyboardEvent
 
@@ -244,8 +254,9 @@ instance keywordMachesSemigroup :: Semigroup KeywordMatches
   where
     append NoMatch _ = NoMatch
     append _ NoMatch = NoMatch
-    append (Matches m1) (Matches m2) = Matches ({ hostnameMatches: m1.hostnameMatches <> m2.hostnameMatches,
-                                                  titleMatches: m1.titleMatches <> m2.titleMatches })
+    append (Matches m1) (Matches m2) =
+      Matches ({ hostnameMatches: m1.hostnameMatches <> m2.hostnameMatches,
+                 titleMatches: m1.titleMatches <> m2.titleMatches })
 
 mkMatch :: String -> String -> String.Pattern -> KeywordMatches
 mkMatch titleLo hostnameLo q =
@@ -284,18 +295,19 @@ filterAndSort searchQuery tabs =
   in
     case NonEmpty.fromArray xs of
       Nothing -> tabs'
-      Just qs -> Array.mapMaybe
-                    (\tab ->
-                        let titleLo = String.toLower tab.title
-                            hostnameLo = String.toLower tab.hostname
-                        in
-                          case foldMap1 (mkMatch titleLo hostnameLo <<< String.Pattern) qs of
-                            NoMatch -> Nothing
-                            Matches m ->
-                              let tab' = tab {titleDisplay = displayHightlights tab.title (joinRanges m.titleMatches),
-                                              hostnameDisplay = displayHightlights tab.hostname (joinRanges m.hostnameMatches)}
-                              in Just tab')
-                    tabs'
+      Just qs ->
+         Array.mapMaybe
+            (\tab ->
+                let titleLo = String.toLower tab.title
+                    hostnameLo = String.toLower tab.hostname
+                in
+                  case foldMap1 (mkMatch titleLo hostnameLo <<< String.Pattern) qs of
+                    NoMatch -> Nothing
+                    Matches m ->
+                      let tab' = tab {titleDisplay = displayHightlights tab.title (joinRanges m.titleMatches),
+                                      hostnameDisplay = displayHightlights tab.hostname (joinRanges m.hostnameMatches)}
+                      in Just tab')
+            tabs'
 
 main :: Effect Unit
 main = HA.runHalogenAff do
