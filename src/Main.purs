@@ -48,11 +48,9 @@ type State = { enabled :: Boolean,
 data Action = Toggle
             | Initialize
             | Tabs (Array TabSource)
-            | HighlightTab Tab
-            | CloseTab Tab
             | UpdateSearch String
             | KeyDown KeyboardEvent
-            | NoOp
+            | SwitchToTab Int
 
 component :: forall q i o m. MonadEffect m => H.Component q i o m
 component =
@@ -158,13 +156,10 @@ renderTab selectedIndex index tab =
     cls name enable = if enable then[ ClassName name ] else []
   in
    HH.li
-    [ HP.classes (cls "tab" true <> cls "selected" selected),
-      HE.onClick \_ -> HighlightTab tab
+    [ HE.onClick \_ -> SwitchToTab tab.id,
+      HP.classes (cls "tab" true <> cls "selected" selected)
     ]
     [
-      -- HH.span [ HP.class_ (ClassName "tab-close-button"), HE.onClick \_ -> CloseTab tab]
-      --         [ HH.span [] [HH.text "close"]],
-
       HH.span [ HP.class_ (ClassName "tab-icon-wrap") ]
               [
                 HH.span
@@ -179,7 +174,6 @@ renderTab selectedIndex index tab =
                 (if tab.hostname == "" then [] else [HH.span [ HP.class_ (ClassName "hostname") ] (renderHighlights tab.hostnameDisplay)])
                 <> [HH.span [ HP.class_ (ClassName "title") ] (renderHighlights tab.titleDisplay)]
               )
-      -- HH.div [ HP.class_ (ClassName "tab-hostname") ]
     ]
 
 renderHighlights arr =
@@ -207,7 +201,6 @@ handleAction = case _ of
   Initialize -> do
     { emitter, listener } <- H.liftEffect HS.create
     liftEffect $ registerCallback (\tabs -> do
-      -- Console.log "callback is being called"
       HS.notify listener (Tabs tabs))
     _ <- H.subscribe emitter
     pure unit
@@ -234,19 +227,12 @@ handleAction = case _ of
       liftEffect $ HTMLElement.focus el
     pure unit
 
-  HighlightTab tab ->
-    pure unit
-
-  CloseTab tab ->
-    pure unit
-
   UpdateSearch query -> do
     H.modify_ \st -> st { sortedTabs = filterAndSort query st.tabs, searchQuery = query, selectedIndex = 0 }
 
   KeyDown keyboardEvent -> handleKeyDown keyboardEvent
 
-  NoOp -> do
-    pure unit
+  SwitchToTab tabId -> liftEffect $ switchToTab tabId
 
 -- range in a string, indexes are 0-based
 -- second index is exlcusive
