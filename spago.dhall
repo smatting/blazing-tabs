@@ -2,7 +2,7 @@
 Welcome to a Spago project!
 You can edit this file as you like.
 -}
-{ name = "my-project"
+{ name = "blazing-tabs"
 , dependencies =
   [ "aff"
   , "arrays"
@@ -26,5 +26,5 @@ You can edit this file as you like.
   , "web-uievents"
   ]
 , packages = ./packages.dhall
-, sources = [ "ui/**/*.purs", "test/**/*.purs" ]
+, sources = [ "src/**/*.purs", "test/**/*.purs" ]
 }
