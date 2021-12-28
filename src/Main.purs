@@ -73,23 +73,41 @@ initialState _ =
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
-  HH.div
-    [ HP.id "tab-view",
-      HP.tabIndex 0,
-      HE.onKeyDown KeyDown
-    ]
-    [ HH.input
-        [ HP.id "tab-search",
-          HP.type_ HP.InputText,
-          HP.value state.searchQuery,
-          HE.onValueInput UpdateSearch,
-          HP.placeholder "Search...",
-          HP.ref (RefLabel "tabSearch")
-        ],
-      HH.ol
-        []
-        (Array.mapWithIndex (renderTab state.selectedIndex) state.sortedTabs)
-    ]
+  HH.div []
+   [
+    HH.div
+      [ HP.id "tab-view",
+        HP.tabIndex 0,
+        HE.onKeyDown KeyDown
+      ]
+      [ HH.input
+          [ HP.id "tab-search",
+            HP.type_ HP.InputText,
+            HP.value state.searchQuery,
+            HE.onValueInput UpdateSearch,
+            HP.placeholder "Search...",
+            HP.ref (RefLabel "tabSearch")
+          ],
+        HH.ol
+          []
+          (Array.mapWithIndex (renderTab state.selectedIndex) state.sortedTabs),
+        HH.div [ HP.class_ (ClassName "quick-help") ] [
+          HH.text "Use the arrow keys and ENTER to switch a tab. Ctrl+Left to close the selected tab. ",
+          HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text " Set up a hotkey" ]
+        ]
+      ],
+    HH.div
+      [ HP.class_ (ClassName "footer") ]
+      [
+        HH.a
+          [ HP.href "#" ]
+          [
+            HH.span [ HP.id "logo" ] [],
+            HH.span [] [ HH.text "Blazing Tabs" ]
+          ]
+      ]
+   ]
+
 
 handleKeyDown :: forall o m. MonadEffect m => KeyboardEvent -> H.HalogenM State Action () o m Unit
 handleKeyDown keyboardEvent = do

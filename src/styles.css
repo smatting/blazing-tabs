@@ -1,29 +1,38 @@
 body {
-    /* background: linear-gradient(#326b96,#2c3459); */
-    /* background: linear-gradient(#94c6eb,#7485c2); */
-    /* background: linear-gradient(#f08218,#7485c2); */
-    /* background: linear-gradient(#f08218,#7485c2); */
-
-    /* background: linear-gradient(#326b96,#7d1959); */
-    /* background: linear-gradient(#454b65,#803966); */
-    /* background: linear-gradient(#803966, #454b65); */
-
     background-color: #454b65;
-    /* height: 100%; */
-
-
     color: #202020;
     font-size: 18px;
-    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
     font-family: sans;
+    color: #eeeeee;
 }
+
+body a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+
 
 #tab-view {
     max-width: 80em;
-    margin-top: 40px;
     margin-left: auto;
     margin-right: auto;
-    background: #f6f6f6;
+}
+
+#tab-search {
+    width: 100%;
+    border: 0px;
+    background-color: #454b65;
+    color: #ffffff;
+    box-sizing: border-box;
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    padding-left: 50px;
+    font-size: 1em;
+}
+
+input:focus {
+    outline: none;
 }
 
 #tab-view ol {
@@ -32,22 +41,18 @@ body {
     margin: 0px;
     padding: 0px;
     list-style-type: none;
-    /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif */
-    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
-    /* font-size: 15px; */
-    /* border-top: 1px solid rgba(255, 255, 255, 0.4); */
-    /* border-bottom: 1px solid rgba(0, 0, 0, 0.4); */
 }
 
 .tab {
     display: table-row;
+    background: #f6f6f6;
     cursor: pointer;
     overflow: hidden;
+    color: #111111;
     width: 100%;
     border-top: 1px solid rgba(255, 255, 255, 0.4);
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
-
 
 .tab-title {
     display: table-cell;
@@ -58,24 +63,24 @@ body {
     vertical-align: top;
 }
 
-.hostname {
-    /* opacity: 0.7; */
-    margin-right: 0.5em;
-}
-
-.title {
-    /* opacity: 0.7; */
-    font-weight: bold;
-}
-
 .tab:hover {
      background-color: #d9e1eb;
 }
 
 .tab.selected {
      background-color: #b6d2f7;
-     /* background-color: #aab5e7; */
-     /* background-color: #f0c9a3; */
+}
+
+.hostname {
+    margin-right: 0.5em;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.hi {
+    background-color: rgba(245, 189, 23, 0.68);
 }
 
 .tab-icon-wrap {
@@ -93,79 +98,52 @@ body {
     background-size: contain;
 }
 
-.highlight {
-    color: #cb166f;
-    /* color: #f08218; */
+.quick-help {
+    font-size: 0.9em;
+    text-align: right;
+    margin-top: 0.5em;
 }
 
-.tab:hover .tab-close-button {
-    visibility: visible;
+.quick-help a {
+    border-bottom: 1px solid white;
+}
+
+.help {
+    max-width: 60em;
+    margin-left: auto;
+    margin-right: auto;
+
 }
 
 
-.tab-close-button:hover {
-    opacity: 1.0;
-    color: #f55600;
+.footer {
+    margin-top: 1em;
+    margin-bottom: 2em;
+    height: 32px;
+    z-index: -1;
+    text-align: right;
+    right: 0px;
+    bottom: 0px;
+    font-size: 20px;
+    line-height: 32px;
 }
 
-.tab-close-button {
-    display: table-cell;
-    min-width: 30px;
-    text-align: center;
-    margin-right: 10px;
-    visibility: hidden;
+.footer a {
     opacity: 0.5;
-    color: white;
-    white-space: nowrap;
+    text-decoration: none;
 }
 
-input:focus {
-    outline: none;
-}
-
-#tab-search {
-    width: 100%;
-    /* padding: 5px; */
-    /* margin-bottom: 10px; */
-    border: 0px;
-    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; */
-    /* font-size: 14px; */
-    color: #ffffff;
-    /* background-color: black; */
-    background-color: #454b65;
-    box-sizing: border-box;
-    padding-top: 0.8em;
-    padding-bottom: 0.8em;
-    padding-left: 50px;
-
-    font-size: 1em;
+.footer a:hover {
+    opacity: 1.0;
 }
 
 #logo {
-    /* cursor: pointer;
-    position: absolute; */
-    z-index: -1;
-    left: 30px;
-    top: 30px;
-
-    width: 200px;
-    height: 200px;
-
-    background-image: url(hummingbird-flaps.png);
+    position: relative;
+    top: 25%;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-image: url(logo.svg);
     background-size: cover;
     background-repeat: no-repeat;
-    
-    background-position-x: 0%;
-    width: 120px;
-    height: 120px;
-    z-index: 2;
-}
-
-#logo:hover {
-    background-position-x: 100%;
-    border: none;
-}
-
-.hi {
-    background-color: rgba(245, 189, 23, 0.68);
 }
