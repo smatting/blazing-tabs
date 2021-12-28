@@ -3,7 +3,8 @@
 # How to build
 
 1. Start a nix-shell `nix-shell`
-2. `./scripts/make.sh`
+2. Run `./scripts/make.sh` to compile `src/index.js`
+2. Run `./scripts/package.sh` to create extension zip in `dist/`.
 
 # How to develop
 
