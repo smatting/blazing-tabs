@@ -1,6 +1,5 @@
 "use strict";
 
-
 exports.favIconUrl = just => nothing => tabSource => {
     if (tabSource.favIconUrl === undefined) {
         return nothing;

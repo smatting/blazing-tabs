@@ -13,13 +13,9 @@ function openSearch() {
       tabs = tabs || [];
       if (tabs.length > 0) {
           const blazingTab = tabs[0];
-          console.log('blazingTab', blazingTab);
-          // sendTabs(blazingTab.windowId);
-
           if (!blazingTab.highlighted) {
             chrome.tabs.highlight({windowId: blazingTab.windowId, tabs: [blazingTab.index]});
           } 
-
       } else {
           makeTab();
       }
@@ -30,7 +26,6 @@ chrome.browserAction.onClicked.addListener(openSearch);
 
 chrome.runtime.onMessage.addListener(function(message, sender) {
   if (message.btabsMsgType == "queryTabs") {
-      console.log('message.tabs', message.tabs);
       sendTabs(message.windowId);
   }
 });

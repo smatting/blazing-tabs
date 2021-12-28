@@ -281,7 +281,6 @@ joinRanges =
     f :: Range -> Int
     f (Range l r) = l
 
-
 data KeywordMatches
       = NoMatch
       | Matches { hostnameMatches :: Array Range, titleMatches :: Array Range }

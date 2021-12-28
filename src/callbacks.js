@@ -1,10 +1,7 @@
 "use strict";
 
 var callbacks = (function() {
-
     function register(name, fn) {
-        // console.log('this is register', name);
-        // console.log('this is fn', fn);
         window.cbks = window.cbks || {};
         window.cbks[name] = window.cbks[name] || [];
         window.cbks[name].push(fn);
@@ -14,9 +11,6 @@ var callbacks = (function() {
         window.cbks = window.cbks || {};
         window.cbks[name] = window.cbks[name] || [];
         window.cbks[name].forEach(function(callback) {
-            // console.log(window.cbks);
-            // console.log('callback is', callback);
-            // console.log('arg is', arg);
             return callback(arg);
         });
     }
@@ -25,5 +19,4 @@ var callbacks = (function() {
         register: register,
         call: call
     });
-
 })();
