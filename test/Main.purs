@@ -10,8 +10,7 @@ import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
 import Test.Spec.Runner (runSpec)
 import Data.String.Pattern (Pattern(..))
-
-import Main (mergeRange, findRanges, joinRanges, Range(..))
+import Range (mergeRange, findRanges, joinRanges, Range(..))
 
 main :: Effect Unit
 main = launchAff_ $ runSpec [consoleReporter] do
