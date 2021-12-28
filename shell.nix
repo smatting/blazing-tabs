@@ -16,5 +16,7 @@ in pkgs.mkShell {
     easy-ps.purs
     easy-ps.spago
     pkgs.pkgs.nodejs-17_x
+    pkgs.p7zip
+    pkgs.jq
   ];
 }
