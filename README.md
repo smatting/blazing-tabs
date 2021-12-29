@@ -12,7 +12,7 @@ Blazing Tabs is available as a:
 
 Features:
 
-- Incremental multi-keyword search. Both the tab's title and domain of url are searched.
+- Incremental multi-keyword search. Both the tab's title and domain are searched.
 - Allows for keyboard-only workflow:
     1. Ctrl+E to open the search
     2. Type to search and use arrow keys to select tab
