@@ -39,15 +39,13 @@ import Web.UIEvent.KeyboardEvent (KeyboardEvent(..))
 import Web.UIEvent.KeyboardEvent as KeyboardEvent
 import Range
 
-type State = { enabled :: Boolean,
-               tabs :: Array Tab,
+type State = {tabs :: Array Tab,
                sortedTabs :: Array Tab,
                searchQuery :: String,
                selectedIndex :: Int
              }
 
-data Action = Toggle
-            | Initialize
+data Action = Initialize
             | Tabs (Array TabSource)
             | UpdateSearch String
             | KeyDown KeyboardEvent
@@ -63,8 +61,7 @@ component =
 
 initialState :: forall i. i -> State
 initialState _ =
-  { enabled: false,
-    tabs: [],
+  { tabs: [],
     sortedTabs: [],
     searchQuery: "",
     selectedIndex: 0
@@ -214,9 +211,6 @@ handleAction = case _ of
       HS.notify listener (Tabs tabs))
     _ <- H.subscribe emitter
     pure unit
-
-  Toggle ->
-    H.modify_ \st -> st { enabled = not st.enabled }
 
   Tabs tabsources -> do
     let (tabs :: Array Tab) =
