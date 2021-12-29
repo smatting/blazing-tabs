@@ -25,8 +25,8 @@ Blazing Tabs is especially useful if you've got so many tabs open that you can't
 Prerequisites: Install [nix](https://nixos.org/). The `shell.nix` pins all the build tools needed to build.
 
 1. Start a nix-shell `nix-shell`. In this shell [spago](https://github.com/purescript/spago) etc are available that can build the app.
-2. Run `./scripts/make.sh` to compile to `src/index.js`
-3. Run `./scripts/package.sh` to create a browser extension zip file in `dist/`.
+2. Inside the nix shell run `./scripts/make.sh` to compile all Purescript code to `src/index.js`
+3. Inside the nix shell run `./scripts/package.sh` to create a browser extension zip file in `dist/`.
 
 ## How to develop
 
