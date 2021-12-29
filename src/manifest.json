@@ -12,12 +12,10 @@
             "128": "logo128.png" },
   "background": { "scripts": ["background.js"] },
   "permissions": ["tabs", "storage"],
-  "incognito": "split",
   "browser_action": {
       "default_title": "Click to open the tab search"
   },
   "manifest_version": 2,
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
