@@ -8,7 +8,7 @@ Blazing Tabs is available as a:
 - [Firefox extension](https://todo)
 - [Google chrome add-on](https://todo)
 
-![demo video](https://github.com/smatting/blazing-tabs/raw/main/assets/workflow-demo.webm.mov)
+![demo video](https://github.com/smatting/blazing-tabs/raw/main/assets/workflow-demo.gif)
 
 Features:
 
