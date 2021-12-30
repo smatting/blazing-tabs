@@ -20,6 +20,8 @@ Features:
     
 Blazing Tabs is especially useful if you've got so many tabs open that you can't barely read their titles anymore.
 
+Blazing Tabs works completely offline. Your data never leaves your browser.
+
 ## How to build
 
 Prerequisites: Install [nix](https://nixos.org/). The `shell.nix` pins all the build tools needed to build.
