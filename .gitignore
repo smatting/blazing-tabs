@@ -7,3 +7,4 @@ src/index.js
 ui-integration/index.js
 dist
 .envrc
+web-ext-artifacts
