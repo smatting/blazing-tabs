@@ -3,20 +3,20 @@
 Blazing Tabs - blazing fast tab search
 </h1>
 
-Blazing Tabs is available as a:
+Blazing Tabs is a browser extension. It is available for
 
-- [Firefox extension](https://todo)
-- [Google chrome add-on](https://todo)
+- Firefox [blazing_tabs-1.0.1-an+fx.xpi](https://github.com/smatting/blazing-tabs/releases/download/v1.0.1/blazing_tabs-1.0.1-an+fx.xpi)
+- Google Chrome [extension in chrome web store](https://chrome.google.com/webstore/detail/blazing-tabs/kapombfhjmjcjonlbcibhekfnjkjjaip)
 
 ![demo video](https://github.com/smatting/blazing-tabs/raw/main/assets/workflow-demo.gif)
 
 Features:
 
-- Incremental multi-keyword search. Both the tab's title and domain are searched.
 - Allows for keyboard-only workflow:
     1. Ctrl+E to open the search
     2. Type to search and use arrow keys to select tab
     3. Hit ENTER to switch to tab, or Ctrl+Left to close the tab
+- Incremental multi-keyword search. Both the tab's title and domain are searched.
     
 Blazing Tabs is especially useful if you've got so many tabs open that you can't barely read their titles anymore.
 
