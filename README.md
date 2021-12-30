@@ -3,7 +3,9 @@
 Blazing Tabs - blazing fast tab search
 </h1>
 
-Blazing Tabs is a browser extension. It is available for
+Blazing Tabs ist a browser extension that allows you to search and switch your tabs blazingly fast.
+
+It is available for
 
 - Firefox [blazing_tabs-1.0.1-an+fx.xpi](https://github.com/smatting/blazing-tabs/releases/download/v1.0.1/blazing_tabs-1.0.1-an+fx.xpi)
 - Google Chrome [extension in chrome web store](https://chrome.google.com/webstore/detail/blazing-tabs/kapombfhjmjcjonlbcibhekfnjkjjaip)
