@@ -1,6 +1,6 @@
 <h1>
 <img src="https://github.com/smatting/blazing-tabs/raw/main/src/logo.svg">
-Blazing Tabs - blazing fast tab search
+Blazing Tabs - a blazing fast tab switcher
 </h1>
 
 Blazing Tabs ist a browser extension that allows you to search and switch your tabs blazingly fast.
