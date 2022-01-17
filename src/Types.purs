@@ -22,5 +22,11 @@ type Tab = {
   favIconUrl :: Maybe String,
   url :: String,
   hostname :: String,
-  hostnameDisplay :: Array (Tuple Highlight String)
+  hostnameDisplay :: Array (Tuple Highlight String),
+  isOwnWindowId :: Boolean
+}
+
+type TabsUpdate = {
+  tabSources :: Array TabSource,
+  ownWindowId :: Int
 }

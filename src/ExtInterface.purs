@@ -2,9 +2,9 @@ module ExtInterface where
 import Effect
 import Prelude
 
-import Types (TabSource)
+import Types (TabsUpdate)
 
-foreign import registerCallback :: (Array TabSource -> Effect Unit) -> Effect Unit
+foreign import registerCallback :: (TabsUpdate -> Effect Unit) -> Effect Unit
 
 foreign import switchToTab :: Int -> Effect Unit
 

@@ -11,8 +11,6 @@ body a {
     text-decoration: none;
 }
 
-
-
 #tab-view {
     max-width: 80em;
     margin-left: auto;
@@ -26,8 +24,8 @@ body a {
     color: #ffffff;
     box-sizing: border-box;
     padding-top: 0.8em;
-    padding-bottom: 0.8em;
-    padding-left: 50px;
+    /* padding-bottom: 0.8em; */
+    padding-left: 44px;
     font-size: 1em;
 }
 
@@ -36,7 +34,7 @@ input:focus {
 }
 
 #tab-view ol {
-    display: table;
+    /* display: table; */
     border-collapse: collapse;
     margin: 0px;
     padding: 0px;
@@ -44,23 +42,24 @@ input:focus {
 }
 
 .tab {
-    display: table-row;
+    box-sizing: border-box;
     background: #f6f6f6;
     cursor: pointer;
     overflow: hidden;
     color: #111111;
     width: 100%;
+
     border-top: 1px solid rgba(255, 255, 255, 0.4);
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+
+    padding: 0.3em 0px;
+    border-left: 5px solid rgba(1,1,1,0.0);
+    border-right: 5px solid rgba(1,1,1,0.0);
 }
 
 .tab-title {
-    display: table-cell;
+    display: inline-block;
     white-space: nowrap;
-    line-height: 1.5em;
-    padding: 0.3em 0px;
-    width: 99%;
-    vertical-align: top;
 }
 
 .tab:hover {
@@ -69,6 +68,10 @@ input:focus {
 
 .tab.selected {
      background-color: #b6d2f7;
+}
+
+.window-break {
+    margin-top: 10px;
 }
 
 .hostname {
@@ -84,11 +87,14 @@ input:focus {
 }
 
 .tab-icon-wrap {
-    display: table-cell;
-    min-width: 50px;
+    display: inline-block;
+    /* width: 50px; */
+    /* padding: 10px 0px; */
     text-align: center;
-    vertical-align: middle;
-    line-height: 0px;
+    padding: 1px 10px;
+    /* vertical-align: center; */
+    /* line-height: 1.7em; */
+    /* border: 1px solid blue; */
 }
 
 .tab-icon {
@@ -96,6 +102,7 @@ input:focus {
     width: 24px;
     height: 24px;
     background-size: contain;
+    vertical-align: middle;
 }
 
 .quick-help {

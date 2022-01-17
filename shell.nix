@@ -15,6 +15,7 @@ in pkgs.mkShell {
   buildInputs = [
     easy-ps.purs
     easy-ps.spago
+    easy-ps.purs-tidy
     pkgs.pkgs.nodejs-17_x
     pkgs.p7zip
     pkgs.jq

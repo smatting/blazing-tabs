@@ -1,15 +1,15 @@
 window.addEventListener('load', (event) => {
   chrome.windows.getCurrent((function(windowInfo) {
-      const myWindowId = windowInfo.id;
+      const ownWindowId = windowInfo.id;
 
       callbacks.register('switchToTab', function(tabId) {
          chrome.tabs.get(tabId, function(tab) {
-           chrome.tabs.highlight({"windowId": myWindowId, "tabs": [tab.index]});
+           chrome.tabs.highlight({"windowId": tab.windowId, "tabs": [tab.index]});
          });
       });
 
       const queryTabs = function() {
-        chrome.runtime.sendMessage(null, {btabsMsgType: "queryTabs", windowId: myWindowId});
+        chrome.runtime.sendMessage(null, {btabsMsgType: "queryTabs"});
       }
 
       window.onfocus = function () {
@@ -22,9 +22,6 @@ window.addEventListener('load', (event) => {
 
       chrome.runtime.onMessage.addListener(function(message, sender) {
           document.getElementById("tab-search").focus();
-          if (message.windowId !== myWindowId) {
-              return;
-          }
 
           if (message.btabsMsgType == "tabs") {
               const tabs = message.tabs.map((function(tab) {
@@ -40,7 +37,8 @@ window.addEventListener('load', (event) => {
                          , url: tab.url
                          };
               }));
-              callbacks.call('notifyTabs', tabs);
+              /* TODO add own window id here */
+              callbacks.call('notifyTabs', {tabSources: tabs, ownWindowId: ownWindowId});
           }
       });
 

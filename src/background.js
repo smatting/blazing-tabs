@@ -1,6 +1,6 @@
-function sendTabs(windowId) {
-    chrome.tabs.query({windowId: windowId}, function(tabs) {
-        chrome.runtime.sendMessage(null, {btabsMsgType: "tabs", tabs: tabs, windowId: windowId});
+function sendTabs() {
+  chrome.tabs.query({}, function(tabs) {
+      chrome.runtime.sendMessage(null, {btabsMsgType: "tabs", tabs: tabs});
     });
 }
 
@@ -26,6 +26,6 @@ chrome.browserAction.onClicked.addListener(openSearch);
 
 chrome.runtime.onMessage.addListener(function(message, sender) {
   if (message.btabsMsgType == "queryTabs") {
-      sendTabs(message.windowId);
+      sendTabs();
   }
 });
