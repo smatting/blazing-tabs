@@ -3,7 +3,7 @@
 Blazing Tabs - a blazing fast tab switcher
 </h1>
 
-Blazing Tabs ist a browser extension that allows you to search and switch your tabs blazingly fast.
+Blazing Tabs is a browser extension that allows you to search and switch your tabs blazingly fast.
 
 It is available for
 
