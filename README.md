@@ -15,7 +15,7 @@ It is available for
 Features:
 
 - Allows for keyboard-only workflow:
-    1. Ctrl+E to open the search
+    1. Ctrl+E to open the search (Cmd+E on mac)
     2. Type to search and use arrow keys to select tab
     3. Hit ENTER to switch to tab, or Ctrl+Left to close the tab
 - Incremental multi-keyword search. Both the tab's title and domain are searched.
