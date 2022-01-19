@@ -1,6 +1,6 @@
 module Main where
 
-import ExtInterface (registerCallback, closeTab)
+import ExtInterface (registerCallback, closeTab, onShortcutResponse, requestShortcut)
 import ExtInterface as ExtInterface
 import DOM.HTML.Indexed
 import Data.Array as Array
@@ -41,12 +41,17 @@ import Web.UIEvent.KeyboardEvent as KeyboardEvent
 import Range
 import Data.Tuple.Nested (type (/\), (/\))
 
+data Shortcut
+  = NoShortcutSetup
+  | ShortcutKey String
+
 type State =
   { tabs :: Array Tab
   , sortedTabs :: Array Tab
   , searchQuery :: String
   , selectedIndex :: Int
   , ownWindowId :: Maybe Int
+  , shortcut :: Maybe Shortcut
   }
 
 data Action
@@ -55,6 +60,7 @@ data Action
   | UpdateSearch String
   | KeyDown KeyboardEvent
   | SwitchToTab Int
+  | Shortcut String
 
 component :: forall q i o m. MonadEffect m => H.Component q i o m
 component =
@@ -71,49 +77,58 @@ initialState _ =
   , searchQuery: ""
   , selectedIndex: 0
   , ownWindowId: Nothing
+  , shortcut: Nothing
   }
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
-  HH.div [ HP.id "app" ]
-    [ HH.div
-        [ HP.id "tab-view"
-        , HP.tabIndex 0
-        , HE.onKeyDown KeyDown
-        ]
-        [ HH.input
-            [ HP.id "tab-search"
-            , HP.type_ HP.InputText
-            , HP.value state.searchQuery
-            , HE.onValueInput UpdateSearch
-            , HP.placeholder "Search..."
-            , HP.ref (RefLabel "tabSearch")
-            ]
-        , HH.ol
-            []
-            (Array.concat (Array.mapWithIndex (renderTab state.ownWindowId state.selectedIndex state.sortedTabs) state.sortedTabs))
+  let
+    shortcutDisplay =
+      case state.shortcut of
+        Nothing -> "(??)"
+        Just (ShortcutKey key) -> key
+        Just NoShortcutSetup -> "(no key set up)"
+  in
 
-        ]
-    , HH.div [ HP.class_ (ClassName "quick-help") ]
-        [ HH.ul_
-            [ HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "(depends)" ], HH.text " Open Blazing Tabs (", HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text "how to setup" ], HH.text ")" ]
-            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "ArrowUp/Down" ], HH.text " Select tab" ]
-            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Enter" ], HH.text " Switch to tab" ]
-            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Ctrl+Left" ], HH.text " Close tab" ]
-            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Esc" ], HH.text " Close Blazing Tabs" ]
-            ]
-        ]
-    , HH.div
-        [ HP.class_ (ClassName "logo-wrapper") ]
-        [ HH.a
-            [ HP.href "https://www.github.com/smatting/blazing-tabs"
-            , HP.target "_blank"
-            ]
-            [ HH.span [ HP.id "logo" ] []
-            , HH.span [] [ HH.text "Blazing Tabs" ]
-            ]
-        ]
-    ]
+    HH.div [ HP.id "app" ]
+      [ HH.div
+          [ HP.id "tab-view"
+          , HP.tabIndex 0
+          , HE.onKeyDown KeyDown
+          ]
+          [ HH.input
+              [ HP.id "tab-search"
+              , HP.type_ HP.InputText
+              , HP.value state.searchQuery
+              , HE.onValueInput UpdateSearch
+              , HP.placeholder "Search..."
+              , HP.ref (RefLabel "tabSearch")
+              ]
+          , HH.ol
+              []
+              (Array.concat (Array.mapWithIndex (renderTab state.ownWindowId state.selectedIndex state.sortedTabs) state.sortedTabs))
+
+          ]
+      , HH.div [ HP.class_ (ClassName "quick-help") ]
+          [ HH.ul_
+              [ HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text shortcutDisplay ], HH.text " Open Blazing Tabs (", HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text "how to setup" ], HH.text ")" ]
+              , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Up/Down" ], HH.text " Select tab" ]
+              , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Enter" ], HH.text " Switch to tab" ]
+              , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Ctrl+Left" ], HH.text " Close tab" ]
+              , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Esc" ], HH.text " Close Blazing Tabs" ]
+              ]
+          ]
+      , HH.div
+          [ HP.class_ (ClassName "logo-wrapper") ]
+          [ HH.a
+              [ HP.href "https://www.github.com/smatting/blazing-tabs"
+              , HP.target "_blank"
+              ]
+              [ HH.span [ HP.id "logo" ] []
+              , HH.span [] [ HH.text "Blazing Tabs" ]
+              ]
+          ]
+      ]
 
 handleKeyDown :: forall o m. MonadEffect m => KeyboardEvent -> H.HalogenM State Action () o m Unit
 handleKeyDown keyboardEvent = do
@@ -237,12 +252,24 @@ urlHostname url =
 handleAction :: forall o m. MonadEffect m => Action → H.HalogenM State Action () o m Unit
 handleAction = case _ of
   Initialize -> do
-    { emitter, listener } <- H.liftEffect HS.create
-    liftEffect $ registerCallback
-      ( \tabsUpdate -> do
-          HS.notify listener (Tabs tabsUpdate)
-      )
-    _ <- H.subscribe emitter
+    do
+      { emitter, listener } <- H.liftEffect HS.create
+      liftEffect $ registerCallback
+        ( \tabsUpdate -> do
+            HS.notify listener (Tabs tabsUpdate)
+        )
+      _ <- H.subscribe emitter
+      pure unit
+
+    do
+      { emitter, listener } <- H.liftEffect HS.create
+      liftEffect $ onShortcutResponse
+        ( \shortcut -> do
+            HS.notify listener (Shortcut shortcut)
+        )
+      _ <- H.subscribe emitter
+      pure unit
+
     pure unit
 
   Tabs ({ tabSources, ownWindowId }) -> do
@@ -265,6 +292,7 @@ handleAction = case _ of
           )
           tabSources
     H.modify_ \st -> st { tabs = tabs, sortedTabs = filterAndSort "" tabs, searchQuery = "", ownWindowId = Just ownWindowId }
+    liftEffect requestShortcut
 
     mbEl <- H.getHTMLElementRef (RefLabel "tabSearch")
     for_ mbEl \el ->
@@ -281,6 +309,10 @@ handleAction = case _ of
   KeyDown keyboardEvent -> handleKeyDown keyboardEvent
 
   SwitchToTab tabId -> switchToTab tabId
+
+  Shortcut shortcutString -> do
+    let shortcut = if shortcutString == "" then NoShortcutSetup else (ShortcutKey shortcutString)
+    H.modify_ \st -> st { shortcut = Just shortcut }
 
 switchToTab :: forall o m. MonadEffect m => Int -> H.HalogenM State Action () o m Unit
 switchToTab tabId = do

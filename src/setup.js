@@ -25,8 +25,24 @@ window.addEventListener('load', (event) => {
           if (message.btabsMsgType == "tabs") {
               callbacks.call('notifyTabs', {tabSources: message.tabs, ownWindowId: ownWindowId});
           }
+          if (message.btabsMsgType == "shortcut-response") {
+              console.log('received shortcut-response', message);
+              callbacks.call('onShortcutResponse', message.shortcut);
+          }
       });
 
       queryTabs();
+
+      const requestShortcut = function() {
+        chrome.runtime.sendMessage(null, {btabsMsgType: "shortcut-request"});
+      }
+
+      callbacks.register('requestShortcut', function() {
+        console.log('requestShortcut');
+        requestShortcut();
+      });
+
+      // requestShortcut();
+
   }));
 });

@@ -42,11 +42,26 @@
     });
   }
 
+  function queryKeyboardShortcuts() {
+     chrome.commands.getAll(function(commands) {
+       if (commands.length == 1) {
+         const command = commands[0];
+         console.log('sending shortcuts');
+         chrome.runtime.sendMessage(null, {btabsMsgType: "shortcut-response", shortcut: command.shortcut});
+       }
+     });
+  }
+
   chrome.browserAction.onClicked.addListener(openSearch);
 
   chrome.runtime.onMessage.addListener(function(message, sender) {
     if (message.btabsMsgType == "queryTabs") {
         sendTabs();
+        queryKeyboardShortcuts();
+    }
+    if (message.btabsMsgType == "shortcut-request") {
+        console.log('received shortcut-request');
+        sendKeyboardShortcuts();
     }
   });
 
@@ -55,6 +70,7 @@
   chrome.tabs.onActivated.addListener(function(activeinfo) {
     tabActivated[activeinfo.tabId] = Date.now();
     sendTabs();
+    queryKeyboardShortcuts();
   });
 
 })();

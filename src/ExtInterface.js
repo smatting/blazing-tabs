@@ -20,3 +20,18 @@ exports.closeTab = function(tabId) {
         callbacks.call('closeTab', tabId);
     }
 };
+
+exports.requestShortcut = function() {
+    return function() {
+        console.log('requestShortcut is called!');
+        callbacks.call('requestShortcut', null);
+    }
+}
+
+exports.onShortcutResponse = function(fn) {
+    return function() {
+        callbacks.register("onShortcutResponse", function(arg) {
+            fn(arg)();
+        });
+    };
+};
