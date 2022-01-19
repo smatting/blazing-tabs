@@ -1,4 +1,18 @@
-body {
+html, body {
+  margin:0px;
+  padding: 0px;
+  height:100%;
+}
+
+#app {
+    min-height: 100vh;
+    position: relative;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 100px;
+    box-sizing: border-box;
+
     background-color: #454b65;
     color: #202020;
     font-size: 18px;
@@ -6,56 +20,48 @@ body {
     color: #eeeeee;
 }
 
-body a {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-#tab-view {
-    max-width: 80em;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 #tab-search {
-    width: 100%;
+    padding-left: 50px;
+    box-sizing: border-box;
     border: 0px;
+
     background-color: #454b65;
     color: #ffffff;
-    box-sizing: border-box;
-    padding-top: 0.8em;
-    /* padding-bottom: 0.8em; */
-    padding-left: 44px;
     font-size: 1em;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 1; /* Firefox */
 }
 
 input:focus {
     outline: none;
 }
 
+#tab-view {
+}
+
 #tab-view ol {
-    /* display: table; */
-    border-collapse: collapse;
     margin: 0px;
     padding: 0px;
     list-style-type: none;
 }
 
 .tab {
-    box-sizing: border-box;
-    background: #f6f6f6;
-    cursor: pointer;
-    overflow: hidden;
-    color: #111111;
-    width: 100%;
-
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-
-    padding: 0.3em 0px;
     border-left: 5px solid rgba(1,1,1,0.0);
     border-right: 5px solid rgba(1,1,1,0.0);
+    box-sizing: border-box;
+    overflow: hidden;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    padding: 0.3em 0px;
     white-space: nowrap;
+
+    cursor: pointer;
+    background: #f6f6f6;
+    color: #111111;
 }
 
 .tab.active {
@@ -68,7 +74,7 @@ input:focus {
 }
 
 .tab:hover {
-     background-color: #d9e1eb;
+     /* background-color: #d9e1eb; */
 }
 
 .tab.selected {
@@ -93,13 +99,8 @@ input:focus {
 
 .tab-icon-wrap {
     display: inline-block;
-    /* width: 50px; */
-    /* padding: 10px 0px; */
     text-align: center;
-    padding: 1px 10px;
-    /* vertical-align: center; */
-    /* line-height: 1.7em; */
-    /* border: 1px solid blue; */
+    padding: 0 10px;
 }
 
 .tab-icon {
@@ -118,34 +119,30 @@ input:focus {
 
 .quick-help a {
     border-bottom: 1px solid white;
+    text-decoration: none;
+    color: white;
 }
 
-.help {
-    max-width: 60em;
-    margin-left: auto;
-    margin-right: auto;
-
-}
-
-
-.footer {
-    margin-top: 1em;
-    margin-bottom: 2em;
+.logo-wrapper {
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    bottom: 20px;
     height: 32px;
-    z-index: -1;
-    text-align: right;
-    right: 0px;
-    bottom: 0px;
+    z-index: 100;
     font-size: 20px;
-    line-height: 32px;
 }
 
-.footer a {
+.logo-wrapper a {
+    color: white;
+}
+
+.logo-wrapper a {
     opacity: 0.5;
     text-decoration: none;
 }
 
-.footer a:hover {
+.logo-wrapper a:hover {
     opacity: 1.0;
 }
 

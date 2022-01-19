@@ -75,7 +75,7 @@ initialState _ =
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
-  HH.div []
+  HH.div [ HP.id "app" ]
     [ HH.div
         [ HP.id "tab-view"
         , HP.tabIndex 0
@@ -98,9 +98,10 @@ render state =
             ]
         ]
     , HH.div
-        [ HP.class_ (ClassName "footer") ]
+        [ HP.class_ (ClassName "logo-wrapper") ]
         [ HH.a
-            [ HP.href "#" ]
+            [ HP.href "https://www.github.com/smatting/blazing-tabs",
+              HP.target "_blank" ]
             [ HH.span [ HP.id "logo" ] []
             , HH.span [] [ HH.text "Blazing Tabs" ]
             ]
