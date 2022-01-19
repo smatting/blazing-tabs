@@ -10,7 +10,7 @@ html, body {
     padding-top: 10px;
     padding-left: 10px;
     padding-right: 10px;
-    padding-bottom: 100px;
+    padding-bottom: 12em;
     box-sizing: border-box;
 
     background-color: #454b65;
@@ -40,6 +40,8 @@ input:focus {
 }
 
 #tab-view {
+    position: relative;
+    z-index: 2;
 }
 
 #tab-view ol {
@@ -112,15 +114,42 @@ input:focus {
 }
 
 .quick-help {
-    font-size: 0.9em;
-    text-align: right;
-    margin-top: 0.5em;
+    display: inline-block;
+    position: absolute;
+    left: 10px;
+    bottom: 20px;
+    z-index: 0;
+}
+
+
+.quick-help:hover {
+    opacity: 1.0;
+}
+
+.quick-help {
+    cursor: default;
+    opacity: 0.3;
+    font-size: 90%;
 }
 
 .quick-help a {
-    border-bottom: 1px solid white;
-    text-decoration: none;
     color: white;
+}
+
+.quick-help ul {
+    margin: 0px;
+    padding-left: 1em;
+}
+
+.quick-help {
+    line-height: 1.5em;
+}
+
+.keyboard-key {
+    background-color: white;
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+    color: black;
 }
 
 .logo-wrapper {
@@ -129,7 +158,6 @@ input:focus {
     right: 10px;
     bottom: 20px;
     height: 32px;
-    z-index: 100;
     font-size: 20px;
 }
 

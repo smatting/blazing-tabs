@@ -92,16 +92,23 @@ render state =
         , HH.ol
             []
             (Array.concat (Array.mapWithIndex (renderTab state.ownWindowId state.selectedIndex state.sortedTabs) state.sortedTabs))
-        , HH.div [ HP.class_ (ClassName "quick-help") ]
-            [ HH.text "Use the arrow keys and ENTER to switch a tab. Ctrl+Left to close the selected tab. "
-            , HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text " Set up a hotkey." ]
+
+        ]
+    , HH.div [ HP.class_ (ClassName "quick-help") ]
+        [ HH.ul_
+            [ HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "(depends)" ], HH.text " Open Blazing Tabs (", HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text "how to setup" ], HH.text ")" ]
+            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "ArrowUp/Down" ], HH.text " Select tab" ]
+            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Enter" ], HH.text " Switch to tab" ]
+            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Ctrl+Left" ], HH.text " Close tab" ]
+            , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Esc" ], HH.text " Close Blazing Tabs" ]
             ]
         ]
     , HH.div
         [ HP.class_ (ClassName "logo-wrapper") ]
         [ HH.a
-            [ HP.href "https://www.github.com/smatting/blazing-tabs",
-              HP.target "_blank" ]
+            [ HP.href "https://www.github.com/smatting/blazing-tabs"
+            , HP.target "_blank"
+            ]
             [ HH.span [ HP.id "logo" ] []
             , HH.span [] [ HH.text "Blazing Tabs" ]
             ]
