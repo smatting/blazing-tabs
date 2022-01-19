@@ -7,9 +7,12 @@ type TabSource = {
   id :: Int,
   windowId :: Int,
   title :: String,
-  url :: String
+  url :: String,
+  lastActivated :: Int,
+  active :: Boolean
 }
 
+-- TODO: move to TabSource
 foreign import favIconUrl :: (String -> Maybe String) -> (Maybe String) -> TabSource -> Maybe String
 
 data Highlight = Highlight | NoHighlight
@@ -23,7 +26,9 @@ type Tab = {
   url :: String,
   hostname :: String,
   hostnameDisplay :: Array (Tuple Highlight String),
-  isOwnWindowId :: Boolean
+  isOwnWindowId :: Boolean,
+  lastActivated :: Int,
+  active :: Boolean
 }
 
 type TabsUpdate = {

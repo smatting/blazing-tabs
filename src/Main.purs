@@ -1,6 +1,7 @@
 module Main where
 
-import ExtInterface (registerCallback, switchToTab, closeTab)
+import ExtInterface (registerCallback, closeTab)
+import ExtInterface as ExtInterface
 import DOM.HTML.Indexed
 import Data.Array as Array
 import Data.Array.NonEmpty (head) as NonEmpty
@@ -38,6 +39,7 @@ import Web.HTML.HTMLElement as HTMLElement
 import Web.UIEvent.KeyboardEvent (KeyboardEvent(..))
 import Web.UIEvent.KeyboardEvent as KeyboardEvent
 import Range
+import Data.Tuple.Nested (type (/\), (/\))
 
 type State =
   { tabs :: Array Tab
@@ -70,10 +72,6 @@ initialState _ =
   , selectedIndex: 0
   , ownWindowId: Nothing
   }
-
--- genWindowEnum :: Array Tab -> Array Int
--- genWindowEnum tabs =
---   Array.sort (Array.nub (tabs <#> (\el -> el.windowId)))
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
@@ -122,7 +120,7 @@ handleKeyDown keyboardEvent = do
       handle
       getSelectedTab >>= \mbTab -> case mbTab of
         Nothing -> pure unit
-        Just tab -> liftEffect $ switchToTab tab.id
+        Just tab -> switchToTab tab.id
     "ArrowLeft" -> do
       when (KeyboardEvent.ctrlKey keyboardEvent) $ do
         handle
@@ -140,6 +138,11 @@ handleKeyDown keyboardEvent = do
                   , sortedTabs = sortedTabs'
                   , selectedIndex = state.selectedIndex `mod` Array.length sortedTabs'
                   }
+    "Escape" -> do
+      mbFirstTab <- getFirstTab
+      for_ mbFirstTab $ \tab ->
+        switchToTab tab.id
+
     _ -> do
       pure unit
   where
@@ -150,6 +153,10 @@ handleKeyDown keyboardEvent = do
   getSelectedTab = do
     state <- H.get
     pure $ Array.index state.sortedTabs state.selectedIndex
+
+  getFirstTab = do
+    state <- H.get
+    pure $ Array.index state.sortedTabs 0
 
 moveSelection :: Int -> State -> State
 moveSelection delta state =
@@ -172,7 +179,7 @@ renderTab ownWindowId selectedIndex sortedTabs index tab =
       <>
         [ HH.li
             [ HE.onClick \_ -> SwitchToTab tab.id
-            , HP.classes (cls "tab" true <> cls "selected" selected)
+            , HP.classes (cls "tab" true <> cls "selected" selected <> cls "active" tab.active)
             ]
             [ HH.span [ HP.class_ (ClassName "tab-icon-wrap") ]
                 [ HH.span
@@ -244,6 +251,8 @@ handleAction = case _ of
               , hostname: urlHostname t.url
               , hostnameDisplay: [ Tuple NoHighlight (urlHostname t.url) ]
               , isOwnWindowId: t.windowId == ownWindowId
+              , lastActivated: t.lastActivated
+              , active: t.active
               }
           )
           tabSources
@@ -263,7 +272,14 @@ handleAction = case _ of
 
   KeyDown keyboardEvent -> handleKeyDown keyboardEvent
 
-  SwitchToTab tabId -> liftEffect $ switchToTab tabId
+  SwitchToTab tabId -> switchToTab tabId
+
+switchToTab :: forall o m. MonadEffect m => Int -> H.HalogenM State Action () o m Unit
+switchToTab tabId = do
+  H.modify_ \st -> st
+    { selectedIndex = 0
+    }
+  liftEffect $ ExtInterface.switchToTab tabId
 
 data KeywordMatches
   = NoMatch
@@ -316,7 +332,7 @@ filterAndSort :: String -> Array Tab -> Array Tab
 filterAndSort searchQuery tabs =
   let
     queries = Array.filter (\x -> x /= "") $ String.split (String.Pattern " ") (String.toLower searchQuery)
-    tabs' = Array.sortWith (\tab -> Tuple (not tab.isOwnWindowId) tab.windowId) $ Array.filter (\tab -> tab.title /= "Blazing Tabs") tabs
+    tabs' = Array.sortWith (\tab -> (not tab.isOwnWindowId) /\ tab.windowId /\ (-tab.lastActivated)) $ Array.filter (\tab -> tab.title /= "Blazing Tabs") tabs
   in
     case NonEmpty.fromArray queries of
       Nothing -> tabs'

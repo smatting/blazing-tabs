@@ -57,6 +57,10 @@ input:focus {
     border-right: 5px solid rgba(1,1,1,0.0);
 }
 
+.tab.active {
+    border-left: 5px solid red;
+}
+
 .tab-title {
     display: inline-block;
     white-space: nowrap;

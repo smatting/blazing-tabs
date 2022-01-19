@@ -22,23 +22,8 @@ window.addEventListener('load', (event) => {
 
       chrome.runtime.onMessage.addListener(function(message, sender) {
           document.getElementById("tab-search").focus();
-
           if (message.btabsMsgType == "tabs") {
-              const tabs = message.tabs.map((function(tab) {
-                  var favIconUrl = null;
-                  if (tab.favIconUrl) {
-                      favIconUrl = tab.favIconUrl.toString();
-                  }
-                  return { id: tab.id
-                         , windowId: tab.windowId
-                         , index: tab.index
-                         , title: tab.title
-                         , favIconUrl: favIconUrl
-                         , url: tab.url
-                         };
-              }));
-              /* TODO add own window id here */
-              callbacks.call('notifyTabs', {tabSources: tabs, ownWindowId: ownWindowId});
+              callbacks.call('notifyTabs', {tabSources: message.tabs, ownWindowId: ownWindowId});
           }
       });
 
