@@ -13,7 +13,7 @@ import Data.List.Types (List(..))
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (unwrap)
 import Data.Semigroup.Foldable (foldMap1)
-import Data.String.CodePoints (contains, indexOf, indexOf', length, splitAt, take) as String
+import Data.String.CodePoints (contains, indexOf, indexOf', length, splitAt, take, stripPrefix) as String
 import Data.String.Common (toLower, split) as String
 import Data.String.Pattern (Pattern(..)) as String
 import Data.String.Regex as Regex
@@ -249,6 +249,9 @@ urlHostname url =
         Just Nothing -> ""
         Just (Just s) -> s
 
+stripWWW :: String -> String
+stripWWW s = fromMaybe s $ String.stripPrefix (String.Pattern "www.") s
+
 handleAction :: forall o m. MonadEffect m => Action → H.HalogenM State Action () o m Unit
 handleAction = case _ of
   Initialize -> do
@@ -283,8 +286,8 @@ handleAction = case _ of
               , titleDisplay: [ Tuple NoHighlight t.title ]
               , favIconUrl: favIconUrl Just Nothing t
               , url: t.url
-              , hostname: urlHostname t.url
-              , hostnameDisplay: [ Tuple NoHighlight (urlHostname t.url) ]
+              , hostname: (stripWWW <<< urlHostname) t.url
+              , hostnameDisplay: [ Tuple NoHighlight ((stripWWW <<< urlHostname) t.url) ]
               , isOwnWindowId: t.windowId == ownWindowId
               , lastActivated: t.lastActivated
               , active: t.active
