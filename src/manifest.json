@@ -15,12 +15,7 @@
   "manifest_version": 2,
   "commands": {
     "_execute_browser_action": {
-      "suggested_key": {
-        "windows": "Ctrl+E",
-        "mac": "Ctrl+E",
-        "chromeos": "Ctrl+E",
-        "linux": "Ctrl+E"
-      }
+      "description": "Launch Blazing Tabs"
     }
   }
 }
