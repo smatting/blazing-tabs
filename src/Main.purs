@@ -2,6 +2,7 @@ module Main where
 
 import ExtInterface (registerCallback, closeTab, onShortcutResponse, requestShortcut)
 import ExtInterface as ExtInterface
+import OsDetails (osDetails, OsDetails)
 import DOM.HTML.Indexed
 import Data.Array as Array
 import Data.Array.NonEmpty (head) as NonEmpty
@@ -45,6 +46,8 @@ data Shortcut
   = NoShortcutSetup
   | ShortcutKey String
 
+data HelpVisible = HelpVisible | HelpHidden
+
 type State =
   { tabs :: Array Tab
   , sortedTabs :: Array Tab
@@ -52,6 +55,8 @@ type State =
   , selectedIndex :: Int
   , ownWindowId :: Maybe Int
   , shortcut :: Maybe Shortcut
+  , helpVisible :: HelpVisible
+  , osDetails :: OsDetails
   }
 
 data Action
@@ -61,23 +66,26 @@ data Action
   | KeyDown KeyboardEvent
   | SwitchToTab Int
   | Shortcut String
+  | HelpSetVisible HelpVisible
 
-component :: forall q i o m. MonadEffect m => H.Component q i o m
-component =
+component :: forall q i o m. MonadEffect m => OsDetails -> H.Component q i o m
+component od = do
   H.mkComponent
-    { initialState
-    , render
+    { initialState: mkInitialState od
+    , render: render
     , eval: H.mkEval $ H.defaultEval { handleAction = handleAction, initialize = Just Initialize }
     }
 
-initialState :: forall i. i -> State
-initialState _ =
+mkInitialState :: forall i. OsDetails -> i -> State
+mkInitialState od _ =
   { tabs: []
   , sortedTabs: []
   , searchQuery: ""
   , selectedIndex: 0
   , ownWindowId: Nothing
   , shortcut: Nothing
+  , helpVisible: HelpHidden
+  , osDetails: od
   }
 
 render :: forall m. State -> H.ComponentHTML Action () m
@@ -88,9 +96,12 @@ render state =
         Nothing -> "(??)"
         Just (ShortcutKey key) -> key
         Just NoShortcutSetup -> "(no key set up)"
+    clsHelp = case state.helpVisible of
+      HelpVisible -> ClassName "help-shown"
+      HelpHidden -> ClassName "help-hidden"
   in
 
-    HH.div [ HP.id "app" ]
+    HH.div [ HP.id "app" ] $
       [ HH.div
           [ HP.id "tab-view"
           , HP.tabIndex 0
@@ -111,10 +122,10 @@ render state =
           ]
       , HH.div [ HP.class_ (ClassName "quick-help") ]
           [ HH.ul_
-              [ HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text shortcutDisplay ], HH.text " Open Blazing Tabs (", HH.a [ HP.href "help.html", HP.target "_blank" ] [ HH.text "how to setup" ], HH.text ")" ]
+              [ HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text shortcutDisplay ], HH.text " Open Blazing Tabs (", HH.a [ HP.href "#", HE.onClick (\_ -> HelpSetVisible HelpVisible) ] [ HH.text "how to setup" ], HH.text ")" ]
               , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Up/Down" ], HH.text " Select tab" ]
               , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Enter" ], HH.text " Switch to tab" ]
-              , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Ctrl+Left" ], HH.text " Close tab" ]
+              , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text (if state.osDetails.os == "Mac OS X" then "⌘+Left" else "Ctrl+Left") ], HH.text " Close tab" ]
               , HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text "Esc" ], HH.text " Close Blazing Tabs" ]
               ]
           ]
@@ -129,6 +140,23 @@ render state =
               ]
           ]
       ]
+        <>
+          case state.helpVisible of
+            HelpHidden -> []
+            HelpVisible ->
+              [ HH.div
+                  [ HP.classes [ ClassName "help", clsHelp ] ]
+                  [ HH.a [ HP.href "#", HE.onClick (\_ -> HelpSetVisible HelpHidden) ] [ HH.text "close" ]
+                  , HH.h2_
+                      ([ HH.text "How to set up a hotkey" ])
+                  , HH.ol_
+                      [ HH.li_ [ HH.text $ if state.osDetails.browser == "Chrome" then "Go to Settings -> \"Extensions\"" else "Go to Settings -> \"Extensions & Themes\"" ]
+                      , HH.li_ [ HH.text $ if state.osDetails.browser == "Chrome" then "Click the Menu Button and select \"Keyboard shortcuts\"" else "Click the Cogwheel and select \"Manage Extension Shortcuts\"" ]
+                      , HH.li_ [ HH.text $ "Find the section for \"Blazing Tabs\" and configure a hotkey, for example:" ]
+                      , HH.ul_ $ map (\k -> HH.li_ [ HH.span [ HP.class_ (ClassName "keyboard-key") ] [ HH.text k ] ]) (if state.osDetails.os == "Mac OS X" then [ "⇧⌘E", "^E" ] else [ "Ctrl+E", "Ctrl+Period" ])
+                      ]
+                  ]
+              ]
 
 handleKeyDown :: forall o m. MonadEffect m => KeyboardEvent -> H.HalogenM State Action () o m Unit
 handleKeyDown keyboardEvent = do
@@ -145,7 +173,7 @@ handleKeyDown keyboardEvent = do
         Nothing -> pure unit
         Just tab -> switchToTab tab.id
     "ArrowLeft" -> do
-      when (KeyboardEvent.ctrlKey keyboardEvent) $ do
+      when (KeyboardEvent.ctrlKey keyboardEvent || KeyboardEvent.metaKey keyboardEvent) $ do
         handle
         getSelectedTab >>= \mbTab -> case mbTab of
           Nothing -> pure unit
@@ -166,7 +194,8 @@ handleKeyDown keyboardEvent = do
       for_ mbFirstTab $ \tab ->
         switchToTab tab.id
 
-    _ -> do
+    s -> do
+      liftEffect $ Console.log ("key: " <> s)
       pure unit
   where
   handle = liftEffect $ do
@@ -317,6 +346,9 @@ handleAction = case _ of
     let shortcut = if shortcutString == "" then NoShortcutSetup else (ShortcutKey shortcutString)
     H.modify_ \st -> st { shortcut = Just shortcut }
 
+  HelpSetVisible visible ->
+    H.modify_ \st -> st { helpVisible = visible }
+
 switchToTab :: forall o m. MonadEffect m => Int -> H.HalogenM State Action () o m Unit
 switchToTab tabId = do
   H.modify_ \st -> st
@@ -402,4 +434,5 @@ filterAndSort searchQuery tabs =
 main :: Effect Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
-  runUI component unit body
+  od <- liftEffect osDetails
+  runUI (component od) unit body
