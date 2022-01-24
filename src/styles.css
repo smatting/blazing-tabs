@@ -14,18 +14,20 @@ html, body {
     box-sizing: border-box;
 
     background-color: #454b65;
-    color: #202020;
     font-size: 18px;
     font-family: sans-serif;
     color: #eeeeee;
+    background: rgba(33,31,70,1);
+    background: linear-gradient(90deg, rgba(33,31,70,1) 0%, rgba(28,109,143,1) 100%);
 }
+
 
 #tab-search {
     padding-left: 50px;
     box-sizing: border-box;
     border: 0px;
 
-    background-color: #454b65;
+    background-color: rgba(255, 255, 255, 0.0);
     color: #ffffff;
     font-size: 1em;
 }
