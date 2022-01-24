@@ -1,4 +1,5 @@
 (function() {
+  const tStart = Date.now();
   const tabActivated = {};
 
   function sendTabs() {
@@ -68,7 +69,7 @@
   chrome.browserAction.onClicked.addListener(openSearch);
 
   chrome.tabs.onActivated.addListener(function(activeinfo) {
-    tabActivated[activeinfo.tabId] = Date.now();
+    tabActivated[activeinfo.tabId] = Math.floor((Date.now() - tStart) / 1000);
     sendTabs();
     queryKeyboardShortcuts();
   });
