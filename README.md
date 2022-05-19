@@ -7,7 +7,7 @@ Blazing Tabs is a browser extension that allows you to search and switch your ta
 
 It is available for
 
-- Firefox [extension in addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/blazing-tabs/)
+- Firefox [extension in addons.mozilla.org](https://addons.mozilla.org/firefox/addon/blazing-tabs/)
 - Google Chrome [extension in chrome web store](https://chrome.google.com/webstore/detail/blazing-tabs/kapombfhjmjcjonlbcibhekfnjkjjaip)
 
 ![demo video](https://github.com/smatting/blazing-tabs/raw/main/assets/workflow-demo.gif)
