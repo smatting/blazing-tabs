@@ -7,15 +7,20 @@
   "icons": { "16": "logo16.png",
              "48": "logo48.png",
             "128": "logo128.png" },
-  "background": { "scripts": ["background.js"] },
+  "background": { "service_worker": "service_worker.js" },
   "permissions": ["tabs", "storage"],
-  "browser_action": {
+  "action": {
       "default_title": "Click to open the tab search"
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "commands": {
-    "_execute_browser_action": {
-      "description": "Launch Blazing Tabs"
+    "_execute_action": {
+      "description": "Launch Blazing Tabs",
+      "suggested_key": {
+        "windows": "Ctrl+E",
+        "mac": "Command+E",
+        "linux": "Ctrl+Shift+E"
+      }
     }
   }
 }
