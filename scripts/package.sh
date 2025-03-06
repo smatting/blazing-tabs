@@ -6,9 +6,8 @@ mkdir -p dist
 rm -f "$archive"
 cd src
 7z a "$archive" \
-    background.js \
+    service_worker.js \
     callbacks.js \
-    help.html \
     index.html \
     index.js \
     logo128.png \
