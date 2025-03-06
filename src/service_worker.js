@@ -65,8 +65,6 @@ chrome.runtime.onMessage.addListener(function(message, sender) {
   }
 });
 
-chrome.action.onClicked.addListener(openSearch);
-
 chrome.tabs.onActivated.addListener(function(activeinfo) {
   tabActivated[activeinfo.tabId] = Math.floor((Date.now() - tStart) / 1000);
   sendTabs();
